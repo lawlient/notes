@@ -1,0 +1,13 @@
+*.o
+*.a
+*.so
+*.out
+*.swp
+*.html
+
+*.pdf
+*.deb
+
+*.png
+*.jpeg
+*.jpg
