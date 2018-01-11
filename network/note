@@ -1,0 +1,362 @@
+*******************************************************************************
+#include <sys/socket.h>
+
+int socket(int domain, int type, int protocol);
+  return : success : file descriptor
+           failed  : -1
+
+  domain   : protocol family information
+                PF_INET           IPv4
+                PF_INET6          IPv6
+                PF_LOCAL
+                PF_PACKET
+                PF_IPX
+
+  type     : data deliver type
+                SOCK_STREAM
+                SOCK_DGRAM
+
+  protocol : protocol information in communication between computer
+                IPPROTO_TCP
+                IPPROTO_UDP
+
+*******************************************************************************
+struct sockaddr_in {
+  sa_family_t     sin_family;      // address family
+                      AF_INET
+                      AF_INET6
+                      AF_LOCAL
+  uint16_t        sin_port;        // 16bit tcp/udp port id
+  struct in_addr  sin_addr;        // 32bit ip address
+  char            sin_zero[8];     // keep sizeof(sockaddr_in) = sizeof(sockaddr)
+};
+
+struct in_addr {
+  in_addr_t       s_addr;          // 32 IPv4 address
+};
+
+
+struct sockaddr {
+  sa_family_t     sin_family;      // address family
+  char            sa_data[14];     // address info
+};
+
+*******************************************************************************
+
+大端序 Big Endian    :  高位字节存放到低位地址
+小端序 Little Endian :  高位字节存放到高位地址
+
+Endian conversions: 
+
+  unsigned short htons(unsigned short);
+  unsigned short ntohs(unsigned short);
+  unsigned long htonl(unsigned long);
+  unsigned long ntohl(unsigned long);
+
+  h : host
+  n : network
+  s : short
+  l : long
+
+*******************************************************************************
+
+#include <arpa/inet.h>
+
+in_addr_t inet_addr(const char *ip);
+  
+  return : success : 32 bit big endian
+           failed  : INADDR_NONE
+
+
+#include <arpa/inet.h>
+
+int inet_aton(const char *ip, struct in_addr *addr);
+
+  return : success : 1 // reserve ip address into addr
+           failed  : 0
+
+*******************************************************************************
+
+#include <arpa/inet.h>
+
+char *inet_ntoa(struct in_addr adr);
+
+  return : success : (char *)IP
+           failed  : -1
+
+  attention : move return value to another memory
+              otherwise,it will be coverd at next time
+
+*******************************************************************************
+initial address info
+
+struct sockaddr_in addr;
+char *serv_port = "9190";
+memset(addr, 0, sizeof(addr));
+addr.sin_family = AF_INET;
+addr.sin_addr.s_addr = htonl(INADDR_ANY);
+addr.sin_port = htons(atoi(serv_port));
+
+   INADDR_ANY : auto get ip address, best use it at server host
+
+*******************************************************************************
+
+#include <sys/socket.h>
+
+int bind(int sockfd, struct sockaddr *myaddr, socklen_t addrlen);
+
+  return : success : 0
+           failed  : -1
+
+  sockfd    : socket file descriptor
+  myaddr    : address info
+  addrlen   : length of myaddr
+
+*******************************************************************************
+
+*******************************************************************************
+
+#include <sys/socket.h>
+
+int shutdown(int sock, int howto);
+
+  return : success 0
+           failed  -1
+
+  sock   : file descriptor
+  howto  : SHUT_RD   : cut input stream
+           ShUT_WR   : cut output stream
+           SHUT_RDWR : cut input and output stream
+
+*******************************************************************************
+
+*******************************************************************************
+
+#include <netdb.h>
+struct hostent {
+  char *h_name;       // official name
+  char **h_aliases;   // alias list
+  int h_addrtype;     // host address type
+  int h_length;       // IP address length, IPv4 4, IPv6 6
+  char **h_addr_list; // address list
+}
+
+struct hostent *gethostbyname(const char *hostname);
+
+  return : success : hostent pointer
+         : failed  : nullptr
+
+
+struct hostent *gethostbyaddr(const char *addr, socklen_t len, int family);
+
+  return : success : hostent pointer
+         : failed  : nullptr
+
+  addr   : pointer of struct in_addr
+  len    : byte length of addr, 4 for IPv4, 16 for IPv6
+  family : info of address family, AF_INET for IPv4, AF_INET6 for IPv6
+*******************************************************************************
+
+*******************************************************************************
+protocol layer | option name           |      read        |        set
+---------------|-----------------------|------------------|--------------------
+               |  SO_SNDBUF            |        O         |         O
+               |  SO_RCVBUF            |        O         |         O
+               |  S0_REUSEADDR         |        O         |         O
+               |  SO_KEEPALIVE         |        O         |         O
+ SOL_SOCKET    |  SO_BROADCAST         |        O         |         O
+               |  SO_DONTROUTE         |        O         |         O
+               |  SO_OOBINLINE         |        O         |         O
+               |  SO_ERROR             |        O         |         X
+               |  SO_TYPE              |        O         |         X
+---------------|-----------------------|------------------|-------------------
+               |  IP_TOS               |        O         |         O
+               |  IP_TTL               |        O         |         O
+IPPROTO_IP     |  IP_MULTICAST_TTL     |        O         |         O
+               |  IP_MULTICAST_LOOP    |        O         |         O
+               |  IP_MULTICAST_IF      |        O         |         O
+---------------|-----------------------|------------------|-------------------
+               |  TCP_KEEPALIVE        |        O         |         O
+IPPROTO_TCP    |  TCP_NODELAY          |        O         |         O
+               |  TCP_MAXSEG           |        O         |         O
+*******************************************************************************
+
+
+*******************************************************************************
+#include <sys/socket.h>
+
+int getsockopt(int sock, int level, int optname, void *optval, socklen_t *optlen);
+
+  return    : success 0, failed -1
+
+  sock      : file descriptor
+  level     : protocol layer
+  optname   : option name to be checked 
+  optval    : reserve value of option checked
+  optlen    : reserve byte number of optval
+
+int setsockopt(int sock, int level, int optname, const void *optval, socklen_t optlen);
+
+  return    : success 0, failed -1
+
+  sock      : file descriptor
+  level     : protocol layer
+  optname   : option name to be modified 
+  optval    : reserve value of option to be modified
+  optlen    : byte number of optval
+*******************************************************************************
+
+*******************************************************************************
+#include <unistd.h>
+
+pid_t fork(void);
+
+  return : success : child process ID
+           failed  : -1
+*******************************************************************************
+
+*******************************************************************************
+#include <sys/wait.h>
+
+pid_t wait(int *status); // equivalent to waitpid(-1, &status, 0);
+
+  return : failed  : -1
+           success : terminate child process ID 
+
+pid_t waitpid(pid_t pid, int *status, int options);
+
+  return : failed  : -1
+           success : terminate child process ID 
+             
+// next to MICROS to split 'status'
+WIFEXITED : return true if child process is terminated normally
+WEXITSTATUS : return the value of child process return value
+*******************************************************************************
+
+*******************************************************************************
+
+#include <unistd.h>
+
+unsigned int alarm(unsigned int seconds);
+
+  return : 0 or remaining time at 'seconds'
+*******************************************************************************
+
+*******************************************************************************
+#include <signal.h>
+ 
+void (*signal(int signo, void (*func)(int)))(int);
+
+  return : the function pointer has registered
+
+int sigaction(int signo, const struct sigaction *act, struct sigaction *oldact);
+
+  return : success : 0
+           failed  : -1
+                                |-SIGALRM : alarm register time is up
+  signo  : signal information --|-SIGINT  : input CTRL+C
+                                |-SIGCHLD : child process terminate
+  act    : register info for the first parameter 'signo'
+  oldact : get registered info 
+
+struct sigaction {
+  void (*sa_handler)(int);
+  sigset_t sa_mask;
+  int sa_flags;
+}
+*******************************************************************************
+
+*******************************************************************************
+#include <unistd.h>
+int pipe(int filedes[2]);
+
+  return : success : 0
+           failed  : -1
+  filedes[0] : file descriptor, pipe export
+  filedes[1] : file descriptor, pipe entrance
+*******************************************************************************
+
+*******************************************************************************
+FD_ZERO(fd_set *fdset); // set all value in fdset to 0
+FD_SET(int fd, fd_set *fdset); // set fdset[fd] = 1
+FD_CLR(int fd, fd_set *fdset); // set fdset[fd] = 0
+FD_ISSET(int fd, fd_set *fdset); // return true if fdset[fd] == 1
+#include <sys/select.h>
+#include <sys/time.h>
+int select(int maxfd, fs_set *readset, fd_set *writeset, 
+           fd_set *exceptset, const struct timeval *timeout);
+
+  return : 0  : time out
+           -1 : error
+           >0 : the number of file descriptor encounter event
+
+  maxfd     : the number of registered file descriptor
+  readset   : register fds monitor whether exist datas to be reading into fdset
+  writeset  : register fds monitor whether exist datas to be deliver into fdset
+  exceptset : register fds monitor whether except happened into fdset 
+  timeout   : upper limit time avoid infinite block
+*******************************************************************************
+
+*******************************************************************************
+#inclucde <stdio.h>
+FILE pointer  <--->  file descriptor
+
+FILE *fdopen(int fildes, const char *mode);
+
+  return : failed : nullptr
+
+int fileno(FILE *stream);
+
+  return failed : -1
+*******************************************************************************
+
+*******************************************************************************
+#include <unistd.h>
+
+int dup(int fildes);
+int dup2(int fildes, int fildes2); // fildes2 specify file descriptor
+
+  return : failed  : -1
+           success : file descriptor
+*******************************************************************************
+
+*******************************************************************************
+typedef union epoll_data {
+  void *ptr;
+  int fd;
+  __uint32_t u32;
+  __uint64_t u64;
+} epoll_data_t;
+
+struct epoll_event {
+  __uint32_t events;
+  epoll_data_t data;
+}
+
+#include <sys/epoll.h>
+
+int epoll_create(int size);
+  
+  return  : success : epoll file descriptor
+            failed  : -1
+
+int epoll_ctl(int epfd, int op, int fd, struct epoll_event *event);
+  
+  return  : success : 0
+            failed  : -1
+
+  epfd    : file descriptor for registering monitor object
+  op      : set option for monitor object(EPOLL_CTL_ADD, EPOLL_CTL_DEL, EPOLL_CTL_MOD)
+  fd      : file descriptor for monitor object to be registerred
+  event   ; monitor object's event type
+
+int epoll_wait(int epfd, struct epoll_event *events, int maxevents, int timeout)
+   
+  return  : success : file descriptor who encounter event
+            failed  : -1
+
+  epfd    : file descriptor for registering monitor object
+  events  : reserve file descriptors those encounter event
+ maxevents: maximum events' number encounter event
+ timeout  : wait time (1/1000s), -1 for waiting until encounter event
+*******************************************************************************
