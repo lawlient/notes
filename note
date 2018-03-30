@@ -101,3 +101,10 @@ sudo apt list --upgradable
 *    sudo snap install electronic-wechat
 *    electronic-wechat // run the application
 ******************************************************************************************
+
+
+******************************************************************************************
+*    fonts install
+*
+*    sudo apt install ttf-mscorefonts-installer
+******************************************************************************************
