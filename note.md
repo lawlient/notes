@@ -1,4 +1,4 @@
-ubuntu 升级软件：
+**ubuntu 升级软件**
 ```
 sudo apt-get update 更新源
 sudo apt-get upgrade 更新已安装的包
@@ -6,18 +6,18 @@ sudo apt-get dist-upgrade 升级系统
 ```
 
 
-ubuntu升级特定软件：
+**ubuntu升级特定软件**
 `sudo apt-get install packgname`
 
 
-查看软件是否安装：
+**查看软件是否安装**
 `dpkg -l | grep filename`
 
 
-查看安装路径
+**查看安装路径**
 `dpkg -L 软件名`
 
-附录:
+**附录**
 ```
 apt-cache search package 搜索包
 apt-cache show package 获取包的相关信息，如说明、大小、版本等
@@ -60,10 +60,8 @@ sudo apt list --upgradable
 |srv|         存储系统提供的服务数据|
 |sys|         系统设备和文件层次结构，并向用户程序提供详细的内核数据信息|
 
-
-
 ------
-*vim can not present chinese font on ubuntu*
+**vim can not present chinese font on ubuntu**
 
 首先，添加中文字符编码： 
 `sudo vim /var/lib/locales/supported.d/local`
@@ -91,7 +89,7 @@ set encoding=prc
 
 --------
 
-*upgrade gcc and g++ on ubuntu*
+**upgrade gcc and g++ on ubuntu**
 
 ```
 sudo add-apt-repository ppa:ubuntu-toolchain-r/test
@@ -101,7 +99,7 @@ sudo apt install gcc-6 g++-6
 ```
 ----
 
-*electronic-wechat on ubuntu*
+**electronic-wechat on ubuntu**
 
 ```
 sudo apt install snapd snapd-xdg-open
@@ -110,7 +108,8 @@ electronic-wechat // run the application
 ```
 
 -----
-*fonts install*
+**fonts install**
 
 `sudo apt install ttf-mscorefonts-installer`
+
 -----
