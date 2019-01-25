@@ -1,8 +1,8 @@
-#DATA STRUCTURE & OBJECT
+# DATA STRUCTURE & OBJECT
 
 All key-value pair in Redis is consist of object, key is always a string object, but value could be a object of string, list, hash, set, sorted set.
 
-##SDS(simple dynamic string)
+## SDS(simple dynamic string)
 
 
 ##LIST
