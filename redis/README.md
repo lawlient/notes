@@ -1,38 +1,50 @@
 # DATA STRUCTURE & OBJECT
 
-All key-value pair in Redis is consist of object, key is always a string object, but value could be a object of string, list, hash, set, sorted set.
+All key-value pair in Redis is consist of object.
+Key is always a string object.
+Value could be a object of string, list, hash, set, sorted set.
 
 ## SDS(simple dynamic string)
 
+SDS is default string representation in redis. C string is used as string literal, it is read-only. For examnple print log.
 
-##LIST
-
-
-
-##DICT
-
-
-##SKIPLIST
-
-
-
-##INTSET
+```
+struct sdshdr {
+  int len;
+  int free;
+  char buf[];
+};
+```
 
 
-##ZIPLIST
-
-
-##OBJECT
+## LIST
 
 
 
-
-#IMPLEMENTATION of SINGLE DATABASE
-
+## DICT
 
 
-#IMPLEMENTATION of MULTI DATABASE
+## SKIPLIST
 
 
 
-#IMPLEMENTATION of INDEPENDENT FUNCTION
+## INTSET
+
+
+## ZIPLIST
+
+
+## OBJECT
+
+
+
+
+# IMPLEMENTATION of SINGLE DATABASE
+
+
+
+# IMPLEMENTATION of MULTI DATABASE
+
+
+
+# IMPLEMENTATION of INDEPENDENT FUNCTION
