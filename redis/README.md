@@ -29,14 +29,14 @@ String in buf is end with '\0', and it is opaque for user, in order to use strin
 2. avoid buffer overflow
 
 3. reduce frequency of memory reallocation
-  1. memory prealloction
+  + memory prealloction
     ```
-    if length of modified sds(sdshdr.len) < 1MB then
+    if length of modified sds(sdshdr.len) < 1MB
         alloc sdshdr.len unused memory
     else
         alloc 1MB unused memory
     ```
-  2. inertia algrithm to free memory
+  + inertia algrithm to free memory
     sds add sdshdr.free replace of free memory direct while sds API need to cut string in sdshdr.buf, and usethose memory to write char in the future.The inertia strategy reduce frequency of memory reallocation. SDS supply API to free unused memory indeed.
 
 4. binary safe
