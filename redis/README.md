@@ -116,6 +116,105 @@ Redis list features:
 
 ## DICT
 
+Dict (symbol table, associative array, map) is a data structure to reserve key-value pair. Dict is widely used in Redis. Redis implement database with dict, and database insert, delete, select, update is built on dict ooperation. On the other hand, dict is used to implement hash key while there are too many key-value pairs in a hash key or many values are long string.
+
+
+### Implementation of Dict
+Redis implement dict with hash table, a hash table compare of many hash node, and a hash node reserve one key-value pair.
+
++ hash table
+`dict.h/dictht` define hash table in Redis.
+
+```
+typedef struct dictht {
+    dictEntry **table;        // hash table array
+    unsigned long size;       // size of hash table
+    unsigned long sizemask;   // to calc index, = size - 1
+    unsigned long used;       // number of node in hash table
+} dictht;
+```
+
++ hash node 
+`dict.h/dictEntry` define hash node to reserve one key-value pair.
+
+```
+typedef struct dictEntry {
+    void *key;
+    union {
+        void *val;
+        uint64_t u64;
+        int64_t s64;
+        double d;
+    } v;
+    struct dictEntry *next;
+} dictEntry;
+```
+
+`dictEntry.next` point to another node, it connect multi node with same key to resolve collision.
+
++ dict 
+`dict.h/dict` represent dict in Redis.
+
+```
+typedef struct dict {
+    dictType *type;
+    void *privdata;
+    dictht ht[2];
+    long rehashidx; /* rehashing not in progress if rehashidx == -1 */
+    unsigned long iterators; /* number of iterators currently running */
+} dict;
+```
+
+`type` and `privdata` is designed to support different type key-value pairs for polymorphic.
+
+`type` is dictType pointer, and dictType reserve a series of function to operate given type key-value pair.
+`privdata` reserve optional parameters for given type functions.
+
+```
+typedef struct dictType {
+    uint64_t (*hashFunction)(const void *key);
+    void *(*keyDup)(void *privdata, const void *key);
+    void *(*valDup)(void *privdata, const void *obj);
+    int (*keyCompare)(void *privdata, const void *key1, const void *key2);
+    void (*keyDestructor)(void *privdata, void *key);
+    void (*valDestructor)(void *privdata, void *obj);
+} dictType;
+```
+
+`dict.ht` is an array including two values, each value is a dictht, and `ht[0]` is used most time, `ht[1]` is used while rehashing. And `dict.rehashidx` represent schedule of rehashing, `dict.rehashidx = -1` if rehash is not going on.
+
+
+### Hash algorithm
+
+While inserting a new key-value pair into dict, first, redis calculate hash and index according to key, then insert new hash node in dict with index.
+
+`hash = dict->type->hashFunction(key);`
+`index = hash & dict->ht[x].sizemask;`
+
+MurmurHash algorithm is designed by Austin Appleby in 2008, its advantage is supplying a good random distribution even if the input key is regular and it is efficient. You can access ![MurmurHash](http://code.google.com/p/smhasher/) to get more information.
+
+
+### Solve collision
+
+Collision: two or more keys are distributed to the same index.
+
+Redis solve collision with separate chaining. Each hash node has a next pointer, so multi nodes could consist singly linked list by next.
+
+
+### Rehash
+
+
+### Gradual rehash
+
+
+### Dict API
+
+
+
+
+
+
+
 
 ## SKIPLIST
 
