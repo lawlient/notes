@@ -72,15 +72,46 @@ sdstrim|remove all char including in C string in sds from right and left|O(M * N
 sdscmp|compare wtheter two sdss are same or not|O(N), N is minimum length of two sdss
 
 
-
-
-
-
-
-
-
 ## LIST
 
+List can resort node efficiently, and access each node ordered, and change length flexible by add or remove node. Redis implement list by itself, and use list to implement list key, publish, subscribe, slow request, monitor and other function. Besides, Redis reserve multi-client informations and build client output buffer by list.
+
+### Implementation of list and list node
+
+`adlist.h/listNode` represent a list node
+
+```
+typedef struct listNode {
+    struct listNode *prev;   // prev node
+    struct listNode *next;   // next node
+    void *value;             // value of node
+} listNode;
+
+```
+
+`adlist.h/list` represent a list
+
+```
+typedef struct list {
+    listNode *head;
+    listNode *tail;
+    void *(*dup)(void *ptr);
+    void (*free)(void *ptr);
+    int (*match)(void *ptr, void *key);
+    unsigned long len;
+} list;
+
+```
+
+Redis list features:
++ double-end: prev and next pointer can access adjacent node with O(1)
++ no-cycle: `list.head->prev` and `list.tail->next` are `NULL`, access double-list end with `NULL`
++ have head and tail pointer: access list head and list tail with O(1)
++ has size counter: list.len record how many nodes list have
++ polymorphic: type of list.value is `void *`, and function dup, free, match can set given type value for node, so list can reserve value of different type
+
+
+### List and List Node API
 
 
 ## DICT
