@@ -203,6 +203,23 @@ Redis solve collision with separate chaining. Each hash node has a next pointer,
 
 ### Rehash
 
+Key in hash table will increase or decrease along with command executing, progress will expand or shrink hash table by rehash in order to control load factor in a right range. 
+
+Rehash Steps:
+1. Allocate memory for ht[1]. Size depends on what operation to be executed and number of keys in ht[0] ( = ht[0].used)
+    + expand : size of ht[1] = (first 2^n >= 2 * ht[0].used)
+    + shrink : size of ht[1] = (first 2^n >= ht[0].userd)
+2. Recalculate hash and index for key in ht[0] migrate to ht[1], and then insert node in ht[0] into ht[1]
+3. When all keys in ht[0] migrate to ht[1], progress free ht[0] and set ht[1] = ht[0] and create a empty dictht in ht[1] for next rehash
+
+Load Factor
+
+load_factor = ht[0].used / ht[0].size
+
+Any condition as follows is satisfied, progress will start rehash to expand hash table.
+1. Server is not execute BGSAVE or BGREWRITEAOF, and load factor of hash table >= 1
+2. Server is executing BGSAVE or BGREWRITEAOF, and load factor of hash table >= 5
+Progress will start rehash to shrink hash table if load factor <= 0.1
 
 ### Gradual rehash
 
