@@ -256,3 +256,22 @@ Progress will start rehash to shrink hash table if load factor <= 0.1
 
 
 # IMPLEMENTATION of INDEPENDENT FUNCTION
+
+
+
+
+
+
+
+
+# PLAN
+April
+1. DataStructure(2weeks)
+    + string : 2days
+    + list : 1days
+    + dict : done
+    + ziplist : 3days
+    + intset : 3days
+    + 5days to adjust
+2. Server(10days)
+3. Client(10days)
