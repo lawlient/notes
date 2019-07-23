@@ -113,3 +113,13 @@ electronic-wechat // run the application
 `sudo apt install ttf-mscorefonts-installer`
 
 -----
+**git diff ignore ^M**
+
+`git config --global core.whitespace cr-at-eol`
+
+----
+
+
+
+
+
