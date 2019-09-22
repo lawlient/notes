@@ -20,3 +20,4 @@
         * Follow the trend
         * Access Internet
 + Critically Analyze What You Read and Hear
++ It's Both What You Say and the Way You Say It
