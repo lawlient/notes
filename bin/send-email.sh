@@ -11,9 +11,9 @@ msg="
     我是测试邮件。\n
 祝你一切顺利！\n
 
-Date: 2022-05-10\n
+Date: 2022-05-11\n
 Addr: 702\n
 "
 
-sendEmail -u $topic -f $sender -s $stmp_addr -t $receiver -m $msg -xu $sender -xp $1
+sendEmail -u $topic -f $sender -s $stmp_addr -t $receiver -xu $sender -xp $1 -o tls=auto message-file="./mail"
 
