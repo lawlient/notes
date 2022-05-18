@@ -7,20 +7,15 @@
 int startx = 0;
 int starty = 0;
 
-char *choices[] = { 	"Choice 1",
-			"Choice 2",
-			"Choice 3",
-			"Choice 4",
-			"Exit",
-		  };
+char *choices[] = {"Choice 1", "Choice 2", "Choice 3", "Choice 4", "Exit", };
 
 int n_choices = sizeof(choices) / sizeof(char *);
 
 void print_menu(WINDOW *menu_win, int highlight);
 void report_choice(int mouse_x, int mouse_y, int *p_choice);
 
-int main()
-{	int c, choice = 0;
+int main() {	
+    int c, choice = 0;
 	WINDOW *menu_win;
 	MEVENT event;
 
@@ -29,6 +24,8 @@ int main()
 	clear();
 	noecho();
 	cbreak();	//Line buffering disabled. pass on everything
+
+	// keypad(menu_win, true);
 
 	/* Try to put the window in the middle of screen */
 	startx = (80 - WIDTH) / 2;
@@ -42,21 +39,22 @@ int main()
 	/* Print the menu for the first time */
 	menu_win = newwin(HEIGHT, WIDTH, starty, startx);
 	print_menu(menu_win, 1);
+
 	/* Get all the mouse events */
 	mousemask(ALL_MOUSE_EVENTS, NULL);
 	
-	while(1)
-	{	c = wgetch(menu_win);
-		switch(c)
-		{	case KEY_MOUSE:
-			if(getmouse(&event) == OK)
-			{	/* When the user clicks left mouse button */
-				if(event.bstate & BUTTON1_PRESSED)
-				{	report_choice(event.x + 1, event.y + 1, &choice);
+	while(1) {
+        c = wgetch(menu_win);
+		switch(c) {	
+            case KEY_MOUSE:
+			if(getmouse(&event) == OK) {
+                /* When the user clicks left mouse button */
+				if(event.bstate & BUTTON1_PRESSED) {
+                    report_choice(event.x + 1, event.y + 1, &choice);
 					if(choice == -1) //Exit chosen
 						goto end;
 					mvprintw(22, 1, "Choice made is : %d String Chosen is \"%10s\"", choice, choices[choice - 1]);
-					refresh(); 
+					refresh();
 				} else {
 					mvprintw(22, 1, "Click state is : %d ", event.bstate);
 					refresh(); 
@@ -66,10 +64,10 @@ int main()
 			break;
             case 'q': goto end;
             default:
-					mvprintw(22, 1, "char is : %d ", c);
-					refresh(); 
+                mvprintw(22, 1, "char is : %d ", c);
+                refresh(); 
 		}
-	}		
+	}
 end:
     getch();
 	endwin();
@@ -77,16 +75,16 @@ end:
 }
 
 
-void print_menu(WINDOW *menu_win, int highlight)
-{
+void print_menu(WINDOW *menu_win, int highlight) {
 	int x, y, i;	
 
 	x = 2;
 	y = 2;
 	box(menu_win, 0, 0);
-	for(i = 0; i < n_choices; ++i)
-	{	if(highlight == i + 1)
-		{	wattron(menu_win, A_REVERSE); 
+
+	for(i = 0; i < n_choices; ++i) {	
+        if(highlight == i + 1) {	
+            wattron(menu_win, A_REVERSE); 
 			mvwprintw(menu_win, y, x, "%s", choices[i]);
 			wattroff(menu_win, A_REVERSE);
 		}
@@ -98,8 +96,8 @@ void print_menu(WINDOW *menu_win, int highlight)
 }
 
 /* Report the choice according to mouse position */
-void report_choice(int mouse_x, int mouse_y, int *p_choice)
-{	int i,j, choice;
+void report_choice(int mouse_x, int mouse_y, int *p_choice) {	
+    int i,j, choice;
 
 	i = startx + 2;
 	j = starty + 3;
