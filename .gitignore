@@ -11,5 +11,7 @@
 *.png
 *.jpeg
 *.jpg
+*/mail*
+*.log
 
 *~
