@@ -4,7 +4,7 @@ project(P1 LANGUAGES C)
 
 set (VERSION 1.0)
 
-add_definitions(-DVERSION="$VERSION")
+add_definitions(-DVERSION="${VERSION}")
 
 include(CheckIncludeFiles)
 check_include_files("getopt.h" HAVE_GETOPT_H)
