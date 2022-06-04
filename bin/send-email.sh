@@ -31,3 +31,5 @@ echo "Addr: dell in 702" >> $mail_file_addr
 psd=`cat /etc/lawlient/psd`
 sendEmail -u $topic -f $sender -s $stmp_addr -t $receiver -xu $sender -xp $psd -o tls=auto message-file="$mail_file_addr"
 
+rm $mail_file_addr
+
