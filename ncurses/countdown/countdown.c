@@ -17,6 +17,11 @@ struct option_t {
     int count_down;
 } goption;
 
+void quit(char* msg) {
+    if (msg) printf("%s\n", msg);
+    endwin();
+    exit(0);
+}
 
 void usage() {
     printf(" Usage: countdown -[hV] [-c color] [-t sec]\n");
@@ -33,6 +38,8 @@ void version(void) {
 }
 
 void parse_option(int argc, char* argv[]) {
+    goption.color = NON;
+    goption.count_down = 25 * 60;
     opterr = 0;
     int optchr;
     while ((optchr = getopt(argc, argv, "c:t:hV")) != EOF) {
@@ -52,7 +59,9 @@ void parse_option(int argc, char* argv[]) {
                 continue;
             }
             case 't': {
-                goption.count_down = atoi(optarg);
+                if ((goption.count_down = atoi(optarg)) <= 0) {
+                    quit("countdow time should be more than 0");
+                };
                 continue;
 	        }
             default: usage(); exit(0);
@@ -78,10 +87,6 @@ void init() {
     initcolor();
 }
 
-void quit() {
-    endwin();
-    exit(0);
-}
 
 void draw() {
     clear();
@@ -139,18 +144,18 @@ int main(int argc, char* argv[]) {
                 case 'g': goption.color = GREEN; break;
                 case 'y': goption.color = CYAN; break;
                 case 'p': pause = !pause; break;
-                case 'q': quit();
+                case 'q': quit(0);
                 default: break;
             }
         }
 
-        if (pause) { sleep(1); continue; }
+        if (pause) { usleep(300000); continue; }
 
         draw();
         --goption.count_down;
 
     } while (goption.count_down);
 
-    quit();
+    quit(0);
     return 0;
 }
