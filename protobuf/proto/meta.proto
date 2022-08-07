@@ -1,0 +1,10 @@
+syntax="proto3";
+
+
+
+message Student {
+    string name    = 1;
+    int32 age      = 2;
+    enum Gender { Male = 0; Female = 1; };
+    Gender gender  = 3;
+};
