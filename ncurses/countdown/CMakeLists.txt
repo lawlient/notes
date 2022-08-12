@@ -19,3 +19,4 @@ add_definitions(-DHAVE_NCURSES_H)
 add_executable(countdown countdown.c)
 target_link_libraries(countdown ${CURSES_LIBRARIES})
 
+install(TARGETS countdown RUNTIME DESTINATION /usr/local/bin)
