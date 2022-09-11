@@ -1,7 +1,7 @@
 # how to make install software with apt
 
 
-## backgroup
+## Backgroup
 
 All of those are starting from an idea : why installing a software in ubuntu is so ease ?
 
@@ -13,7 +13,7 @@ The answer is **launchpad**.
 
 The tutorial is going to record the solution to install your software with ppa.
 
-## steps
+## Steps
 
 
 ### 1. Setting up an account in [launchpad](https://launchpad.net/). 
@@ -134,7 +134,7 @@ May be you have to wait a long time, after you just upload your deb.
 
 
 
-### reference
+## Reference
 
 - [Building a Debian (`.deb`) source package, and publishing it on an Ubuntu PPA](https://saveriomiroddi.github.io/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa/#preparing-the-source-package)
 
