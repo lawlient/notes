@@ -131,3 +131,13 @@ sudo apt update
 ```
 
 May be you have to wait a long time, after you just upload your deb.
+
+
+
+### reference
+
+- [Building a Debian (`.deb`) source package, and publishing it on an Ubuntu PPA](https://saveriomiroddi.github.io/Building-a-debian-deb-source-package-and-publishing-it-on-an-ubuntu-ppa/#preparing-the-source-package)
+
+- [Personal Package Archives](https://help.launchpad.net/Packaging/PPA)
+
+- [Debian 新维护者手册](https://www.debian.org/doc/manuals/maint-guide/)
