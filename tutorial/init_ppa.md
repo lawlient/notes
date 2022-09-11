@@ -18,7 +18,7 @@ The tutorial is going to record the solution to install your software with ppa.
 
 ### 1. Setting up an account in [launchpad](https://launchpad.net/). 
 
-It needs a name and a email address you are using.
+It needs a name and an email address you are using.
 
 ### 2. Activate your ppa. 
 
@@ -52,7 +52,7 @@ You have to decrypt the content in confirm email with your private gpg key.
 
 Cause of your email reader is likely to unsupport decrypt.
 
-You have to copy the text between *-----BEGIN PGP MESSAGE-----* and *-----END PGP MESSAGE-----* into a file as tmp.txt.
+You have to copy the text between ***-----BEGIN PGP MESSAGE-----*** and ***-----END PGP MESSAGE-----*** into a file as tmp.txt.
 
 ```
 gpg --decrypt tmp.txt
@@ -66,8 +66,8 @@ At here, everything you need is prepared.
 
 4.1 Source code, like a hello world process with c.
 ```bash
-mkdir hello_world
-cd hello_world
+mkdir hello_world && cd hello_world
+
 touch hello_world.c
 ```
 
@@ -88,7 +88,7 @@ Create a makefile as follow:
 BINDIR := /usr/bin
 
 all:
-    gcc main.c -o my_hello_world
+    gcc hello_world.c -o helloworld
 
 install:
     mkdir -p ${DESTDIR}${BINDIR}
@@ -98,12 +98,13 @@ install:
 4.3 Software metadata and control files based on your source code.
 ```bash
 dh_make -p helloworld_0.0.0.1 --single --native --copyright mit --email $youremail
+
 rm debian/*.{ex,EX}
 ```
 
 After commands executing you will get a directory named debian.
 
-You have to update your changelog and control file in *debian* folder.
+You have to update your changelog and control file in ***debian*** folder.
 
 4.4 Build your deb.
 
