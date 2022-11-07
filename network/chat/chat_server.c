@@ -27,7 +27,9 @@ void *handle_clnt(void *arg) {
   int strLen;
   while ((strLen = read(client, msg, sizeof(msg))) != 0) {
     send_msg(msg, strLen);
+    fputs("sending done", stderr);
   }
+  fputs("not read any more" stderr);
   pthread_mutex_lock(&mutex);
   for (int i = 0; i < clnt_cnt; i++) {
     if (client == clients[i]) {
