@@ -1,0 +1,22 @@
+digraph ngx_array {
+    rankdir=LR
+
+    array [
+        shape="none"
+        margin=0
+        label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'> 
+            <tr> <td port="elts"> void *elts </td> </tr>
+            <tr> <td port="nelts"> ngx_uint_t nelts</td> </tr>
+            <tr> <td port="size"> size_t size </td> </tr>
+            <tr> <td> ngx_uint_t nalloc </td> </tr>
+            <tr> <td> ngx_pool_t  *pool </td> </tr>
+        </table>>
+    ]
+
+    elts [
+        shape="record"
+        label="<elts> 0 | 1 | 2 | ... | nelts - 1"
+    ]
+
+    array:elts -> elts:elts
+}

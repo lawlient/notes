@@ -1,0 +1,59 @@
+digraph ngx_buf {
+    compound=true;
+    rankdir=LR;
+
+    subgraph buf {
+        { rank=same; };
+        ngx_buf_s [
+            shape="none"
+            label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'> 
+                <tr> <td port="pos"> u_char *pos </td> </tr>
+                <tr> <td> u_char *last </td> </tr>
+                <tr> <td> off_t file_pos </td> </tr>
+                <tr> <td> off_t file_last </td> </tr>
+                <tr> <td> u_char *start </td> </tr>
+                <tr> <td> u_char *end </td> </tr>
+                <tr> <td> ngx_buf_tag_t tag </td> </tr>
+                <tr> <td> ngx_file_t *file </td> </tr>
+                <tr> <td> ngx_buf_t *shadow </td> </tr>
+                <tr> <td> unsigned temporary:1 </td> </tr>
+                <tr> <td> unsigned memory:1 </td> </tr>
+                <tr> <td> unsigned mmap:1 </td> </tr>
+                <tr> <td> unsigned recycled:1 </td> </tr>
+                <tr> <td> unsigned in_file:1 </td> </tr>
+                <tr> <td> unsigned flush:1 </td> </tr>
+                <tr> <td> unsigned sync:1 </td> </tr>
+                <tr> <td> unsigned last_buf:1 </td> </tr>
+                <tr> <td> unsigned last_in_chain:1 </td> </tr>
+                <tr> <td> unsigned last_shadow:1 </td> </tr>
+                <tr> <td> unsigned temp_file:1 </td> </tr>
+                <tr> <td> int num </td> </tr>
+            </table>>
+        ]
+    }
+
+    subgraph chain {
+        { rank=same; };
+
+        ngx_chain_s [
+            shape="record"
+            label="{ <buf> ngx_buf_t *buf | <next> ngx_chain_t *next }"
+        ]
+
+        ngx_chain_node1 [
+            shape="record"
+            label="{ <buf> buf | <next> next }"
+        ]
+
+        ngx_chain_node2 [
+            shape="record"
+            label="{ <buf> buf | null }"
+        ]
+
+        ngx_chain_s:next -> ngx_chain_node1:buf
+        ngx_chain_node1:next -> ngx_chain_node2:buf
+    }
+
+
+    ngx_chain_s:buf:s -> ngx_buf_s:pos:n
+}
