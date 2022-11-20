@@ -36,7 +36,7 @@ You have to add a **passphrase** for your key, remember it please.
 
 - 3.2 Upload your key to keyserver (to store Public key all over the world), execute command:
 ```
-gpg --send-keys [your key id] --keyserver keyserver.ubuntu.com
+gpg --keyserver https://keyserver.ubuntu.com --send-keys [your key id] 
 ```
 - 3.3 Import gpg key into your launchpad account.
 ```
