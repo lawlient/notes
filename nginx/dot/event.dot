@@ -1,0 +1,55 @@
+digraph ngx_event {
+    node [shape="none" margin=0]
+    event [
+        label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'>
+            <tr> <td bgcolor="black"> <font color="white">ngx_event_s </font></td> </tr>
+            <tr> <td align="left"> void            *data </td> </tr>
+            <tr> <td align="left"> unsigned         write:1 </td> </tr>
+            <tr> <td align="left"> unsigned         accept:1 </td> </tr>
+            <tr> <td align="left"> unsigned         instance:1 </td> </tr>
+            <tr> <td align="left"> unsigned         active:1 </td> </tr>
+            <tr> <td align="left"> unsigned         disabled:1 </td> </tr>
+            <tr> <td align="left"> unsigned         ready:1 </td> </tr>
+            <tr> <td align="left"> unsigned         oneshot:1 </td> </tr>
+            <tr> <td align="left"> unsigned         complete:1 </td> </tr>
+            <tr> <td align="left"> unsigned         eof:1 </td> </tr>
+            <tr> <td align="left"> unsigned         error:1 </td> </tr>
+            <tr> <td align="left"> unsigned         timedout:1 </td> </tr>
+            <tr> <td align="left"> unsigned         timer_set:1 </td> </tr>
+            <tr> <td align="left"> unsigned         delayed:1 </td> </tr>
+            <tr> <td align="left"> unsigned         deferred_accept:1 </td> </tr>
+            <tr> <td align="left"> unsigned         pending_eof:1 </td> </tr>
+            <tr> <td align="left"> unsigned         posted:1 </td> </tr>
+            <tr> <td align="left"> unsigned         closed:1 </td> </tr>
+            <tr> <td align="left"> unsigned         channel:1 </td> </tr>
+            <tr> <td align="left"> unsigned         resolver:1 </td> </tr>
+            <tr> <td align="left"> unsigned         cancelable:1 </td> </tr>
+            <tr> <td align="left" bgcolor="grey"> unsigned         kq_vnode:1 </td> </tr>
+            <tr> <td align="left" bgcolor="grey"> int              kq_errno </td> </tr>
+            <tr> <td align="left"> int              available </td> </tr>
+            <tr> <td align="left"> ngx_event_handler_pt  handler </td> </tr>
+            <tr> <td align="left" bgcolor="grey"> ngx_event_ovlp_t ovlp </td> </tr>
+            <tr> <td align="left"> ngx_uint_t       index </td> </tr>
+            <tr> <td align="left"> ngx_log_t       *log </td> </tr>
+            <tr> <td align="left"> ngx_rbtree_node_t   timer </td> </tr>
+            <tr> <td align="left"> ngx_queue_t      queue </td> </tr>
+        </table>>
+    ]
+
+    ngx_event_actions_t [
+        label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'>
+            <tr> <td bgcolor="black"> <font color="white">ngx_event_actions_t</font> </td> </tr>
+            <tr> <td align="left"> ngx_int_t  (*add)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags) </td> </tr>
+            <tr> <td align="left"> ngx_int_t  (*del)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags) </td> </tr>
+            <tr> <td align="left"> ngx_int_t  (*enable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags) </td> </tr>
+            <tr> <td align="left"> ngx_int_t  (*disable)(ngx_event_t *ev, ngx_int_t event, ngx_uint_t flags) </td> </tr>
+            <tr> <td align="left"> ngx_int_t  (*add_conn)(ngx_connection_t *c) </td> </tr>
+            <tr> <td align="left"> ngx_int_t  (*del_conn)(ngx_connection_t *c, ngx_uint_t flags) </td> </tr>
+            <tr> <td align="left"> ngx_int_t  (*notify)(ngx_event_handler_pt handler) </td> </tr>
+            <tr> <td align="left"> ngx_int_t  (*process_events)(ngx_cycle_t *cycle, ngx_msec_t timer, ngx_uint_t flags) </td> </tr>
+            <tr> <td align="left"> ngx_int_t  (*init)(ngx_cycle_t *cycle, ngx_msec_t timer) </td> </tr>
+            <tr> <td align="left"> void       (*done)(ngx_cycle_t *cycle) </td> </tr>
+        </table>>
+    ]
+
+}
