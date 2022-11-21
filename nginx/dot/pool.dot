@@ -1,0 +1,46 @@
+digraph ngx_pool {
+    pool [
+        shape="none"
+        margin=0
+        label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'> 
+            <tr>
+                <td bgcolor="green" port="last"> last </td>
+                <td bgcolor="green" port="end"> end </td>
+                <td bgcolor="green" port="next"> next </td>
+                <td bgcolor="green"> failed </td>
+                <td> max </td>
+                <td port="current"> current </td>
+                <td port="chain"> chain </td>
+                <td port="large"> large </td>
+                <td port="cleanup"> cleanup </td>
+                <td port="log"> log </td>
+                <td bgcolor="black"><font color="white"> allocated mem </font></td>
+                <td port="free"><font color="green"> free small area </font></td>
+                <td port="free" bgcolor="red"> segment fault </td>
+            </tr>
+        </table>>
+    ]
+
+    block [
+        shape="none"
+        margin=0
+        label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'> 
+            <tr>
+                <td bgcolor="green" port="last"> last </td>
+                <td bgcolor="green" port="end"> end </td>
+                <td bgcolor="green" port="next"> next </td>
+                <td bgcolor="green"> failed </td>
+                <td bgcolor="black"><font color="white"> allocated mem </font></td>
+                <td port="free"><font color="green"> free small area </font></td>
+                <td port="free" bgcolor="red"> segment fault </td>
+            </tr>
+        </table>>
+    ]
+
+    pool:next -> block:last:w
+    pool:last:n -> pool:free:nw
+    pool:end:n -> pool:free:ne
+
+    block:last:n -> block:free:nw
+    block:end:n -> block:free:ne
+}
