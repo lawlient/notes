@@ -39,8 +39,8 @@ digraph ngx_pool {
 
     pool:next -> block:last:w
     pool:last:n -> pool:free:nw
-    pool:end:n -> pool:free:ne
+    pool:end:n -> pool:free:ne [ style = "dashed" ]
 
     block:last:n -> block:free:nw
-    block:end:n -> block:free:ne
+    block:end:n -> block:free:ne [ style = "dashed" ]
 }
