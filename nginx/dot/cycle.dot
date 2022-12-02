@@ -1,0 +1,42 @@
+digraph cycle {
+    ngx_cycle_s [
+        shape="none"
+        label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'> 
+            <tr> <td bgcolor="black"> <font color="white"> ngx_cycle_s </font></td> </tr>
+            <tr> <td> void                  ****conf_ctx</td> </tr>
+            <tr> <td> ngx_pool_t               *pool</td> </tr>
+            <tr> <td> ngx_log_t                *log</td> </tr>
+            <tr> <td> ngx_log_t                 new_log</td> </tr>
+            <tr> <td> ngx_uint_t                log_use_stderr</td> </tr>
+            <tr> <td> ngx_connection_t        **files</td> </tr>
+            <tr> <td> ngx_connection_t         *free_connections</td> </tr>
+            <tr> <td> ngx_uint_t                free_connection_n</td> </tr>
+            <tr> <td> ngx_module_t            **modules</td> </tr>
+            <tr> <td> ngx_uint_t                modules_n</td> </tr>
+            <tr> <td> ngx_uint_t                modules_used</td> </tr>
+            <tr> <td> ngx_queue_t               reusable_connections_queue</td> </tr>
+            <tr> <td> ngx_uint_t                reusable_connections_n</td> </tr>
+            <tr> <td> time_t                    connections_reuse_time</td> </tr>
+            <tr> <td> ngx_array_t               listening</td> </tr>
+            <tr> <td> ngx_array_t               paths</td> </tr>
+            <tr> <td> ngx_array_t               config_dump</td> </tr>
+            <tr> <td> ngx_rbtree_t              config_dump_rbtree</td> </tr>
+            <tr> <td> ngx_rbtree_node_t         config_dump_sentinel</td> </tr>
+            <tr> <td> ngx_list_t                open_files</td> </tr>
+            <tr> <td> ngx_list_t                shared_memory</td> </tr>
+            <tr> <td> ngx_uint_t                connection_n</td> </tr>
+            <tr> <td> ngx_uint_t                files_n</td> </tr>
+            <tr> <td> ngx_connection_t         *connections</td> </tr>
+            <tr> <td> ngx_event_t              *read_events</td> </tr>
+            <tr> <td> ngx_event_t              *write_events</td> </tr>
+            <tr> <td> ngx_cycle_t              *old_cycle</td> </tr>
+            <tr> <td> ngx_str_t                 conf_file</td> </tr>
+            <tr> <td> ngx_str_t                 conf_param</td> </tr>
+            <tr> <td> ngx_str_t                 conf_prefix</td> </tr>
+            <tr> <td> ngx_str_t                 prefix</td> </tr>
+            <tr> <td> ngx_str_t                 error_log</td> </tr>
+            <tr> <td> ngx_str_t                 lock_file</td> </tr>
+            <tr> <td> ngx_str_t                 hostname</td> </tr>
+        </table>>
+    ]
+}

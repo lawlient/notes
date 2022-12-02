@@ -1,0 +1,35 @@
+digraph ngx_module {
+    node [shape="none" margin=0]
+
+    module [
+        label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'> 
+            <tr> <td bgcolor="black"> <font color="white"> ngx_module_s </font></td> </tr>
+            <tr> <td> ngx_uint_t            ctx_index </td> </tr>
+            <tr> <td> ngx_uint_t            index </td> </tr>
+            <tr> <td> char                 *name </td> </tr>
+            <tr> <td> ngx_uint_t            spare0 </td> </tr>
+            <tr> <td> ngx_uint_t            spare1 </td> </tr>
+            <tr> <td> ngx_uint_t            version </td> </tr>
+            <tr> <td> const char           *signature </td> </tr>
+            <tr> <td> void                 *ctx </td> </tr>
+            <tr> <td> ngx_command_t        *commands </td> </tr>
+            <tr> <td> ngx_uint_t            type </td> </tr>
+            <tr> <td> ngx_int_t           (*init_master)(ngx_log_t *log) </td> </tr>
+            <tr> <td> ngx_int_t           (*init_module)(ngx_cycle_t *cycle) </td> </tr>
+            <tr> <td> ngx_int_t           (*init_process)(ngx_cycle_t *cycle) </td> </tr>
+            <tr> <td> ngx_int_t           (*init_thread)(ngx_cycle_t *cycle) </td> </tr>
+            <tr> <td> void                (*exit_thread)(ngx_cycle_t *cycle) </td> </tr>
+            <tr> <td> void                (*exit_process)(ngx_cycle_t *cycle) </td> </tr>
+            <tr> <td> void                (*exit_master)(ngx_cycle_t *cycle) </td> </tr>
+            <tr> <td> uintptr_t             spare_hook0 </td> </tr>
+            <tr> <td> uintptr_t             spare_hook1 </td> </tr>
+            <tr> <td> uintptr_t             spare_hook2 </td> </tr>
+            <tr> <td> uintptr_t             spare_hook3 </td> </tr>
+            <tr> <td> uintptr_t             spare_hook4 </td> </tr>
+            <tr> <td> uintptr_t             spare_hook5 </td> </tr>
+            <tr> <td> uintptr_t             spare_hook6 </td> </tr>
+            <tr> <td> uintptr_t             spare_hook7 </td> </tr>
+        </table>>
+    ]
+
+}

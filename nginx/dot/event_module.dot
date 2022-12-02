@@ -1,0 +1,124 @@
+digraph ngx_event_core_module {
+    rankdir = LR
+
+    node [shape="none" margin=0]
+
+    ngx_event_core_module [
+        label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'> 
+            <tr> <td bgcolor="black"> <font color="white"> ngx_event_core_module </font></td> </tr>
+            <tr> <td> -1 </td> </tr>
+            <tr> <td> -1 </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> ngx_version </td> </tr>
+            <tr> <td> const char           *signature </td> </tr>
+            <tr> <td port="ctx"> void                 *ctx </td> </tr>
+            <tr> <td port="commands"> ngx_command_t        *commands </td> </tr>
+            <tr> <td> 0x544E5645 </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> ngx_event_module_init </td> </tr>
+            <tr> <td> ngx_event_process_init </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+        </table>>
+    ]
+
+    ngx_events_module [
+        label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'> 
+            <tr> <td bgcolor="black"> <font color="white"> ngx_events_module </font></td> </tr>
+            <tr> <td> -1 </td> </tr>
+            <tr> <td> -1 </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> ngx_version </td> </tr>
+            <tr> <td> const char           *signature </td> </tr>
+            <tr> <td port="ctx"> void                 *ctx </td> </tr>
+            <tr> <td port="commands"> ngx_command_t        *commands </td> </tr>
+            <tr> <td> 0x45524F43 </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> NULL </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+            <tr> <td> 0 </td> </tr>
+        </table>>
+    ]
+
+    {
+        rank=same;
+
+        ngx_event_core_module_ctx [
+            label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'> 
+                <tr> <td bgcolor="black"> <font color="white"> ngx_event_core_module_ctx </font></td> </tr>
+                <tr> <td port="name"> ngx_str_t *name </td> </tr>
+                <tr> <td> void *(*create_conf)(ngx_cycle_t *cycle) </td> </tr>
+                <tr> <td> char *(*init_conf)(ngx_cycle_t *cycle, void *conf) </td> </tr>
+                <tr> <td> ngx_event_actions_t actions </td> </tr>
+            </table>>
+        ]
+        
+        ngx_event_core_commands [
+            label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'> 
+                <tr> <td bgcolor="black"> <font color="white"> ngx_event_core_commands </font></td> </tr>
+                <tr> <td port="ngx_event_core_commands"> worker_connections </td> </tr>
+                <tr> <td> use </td> </tr>
+                <tr> <td> multi_accept </td> </tr>
+                <tr> <td> accept_mutex </td> </tr>
+                <tr> <td> accept_mutex_delay </td> </tr>
+                <tr> <td> debug_connnection </td> </tr>
+                <tr> <td> null_command </td> </tr>
+            </table>>
+        ]
+
+        ngx_events_module_ctx [
+            label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'> 
+                <tr> <td bgcolor="black"> <font color="white"> ngx_events_module_ctx </font></td> </tr>
+                <tr> <td port="name"> ngx_str_t name </td> </tr>
+                <tr> <td> NULL </td> </tr>
+                <tr> <td> char *(*init_conf)(ngx_cycle_t *cycle, void *conf) </td> </tr>
+            </table>>
+        ]
+        
+        ngx_events_commands [
+            label=<<table border='0' cellspacing='0' cellborder='1' cellpadding='4'> 
+                <tr> <td bgcolor="black"> <font color="white"> ngx_events_commands </font></td> </tr>
+
+                <tr> <td bgcolor="grey" port="events"> events </td> </tr>
+                <tr> <td bgcolor="grey" port="events.type"> NGX_MAIN_CONF|NGX_CONF_BLOCK|NGX_CONF_NOARGS </td> </tr>
+                <tr> <td bgcolor="grey" port="events.set"> ngx_events_block </td> </tr>
+                <tr> <td bgcolor="grey" port="events.conf"> 0 </td> </tr>
+                <tr> <td bgcolor="grey" port="events.offset"> 0 </td> </tr>
+                <tr> <td bgcolor="grey" port="events.post"> NULL </td> </tr>
+
+                <tr> <td> null_command </td> </tr>
+            </table>>
+        ]
+    }
+
+    ngx_event_core_module:ctx -> ngx_event_core_module_ctx:name -> event_core
+    ngx_event_core_module:commands ->  ngx_event_core_commands:ngx_event_core_commands
+
+    ngx_events_module:ctx -> ngx_events_module_ctx:name -> events
+    ngx_events_module:commands ->  ngx_events_commands:events
+}
