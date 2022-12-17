@@ -12,60 +12,61 @@
 
 ### Core
 
-For red child and black parent, exchanging their color and rotate parent tree, the red child will transfer to opposite subtree.
+  For red child and black parent, exchanging their color and rotate parent tree, the red child will transfer to opposite subtree.
 
 ### Cases
 
-First of all, insert node is red. We have cases as follows:
+  First of all, insert node is red. We have cases as follows:
 
 #### Parent is **black**
 
-no rule is broken. **Easy**.
+  No rule is broken. **Easy**.
 
 #### Parent is **red**.
 
-Cause of rule 4 is broken, we have to rebalance the tree.
+  Cause of rule 4 is broken, we have to rebalance the tree.
 
-The key to rebalance is looking at **uncle node**.
+  The key to rebalance is looking at **uncle node**.
 
 ##### Uncle node is red.
 
-The grandparent must be **black**, we change parent & uncle tobe black, and grandparent to red.
+  The grandparent must be **black**, we change parent & uncle tobe black, and grandparent to red.
 
-Every node keep the rules except grandparent, cause we don't know what is his/her parent's color.
+  Every node keep the rules except grandparent, cause we don't know what is his/her parent's color.
 
-But for now, we can transfer insert node to grandparent, then, we can solve it recursively upward.
+  But for now, we can transfer insert node to grandparent, then, we can solve it recursively upward.
 
 ##### Uncle node is **black**.
 
-Grandparent must be black.
+  Grandparent must be black.
 
-Cause three is symmetrical, inserting right node is equivalent to inserting left node.
+  Cause three is symmetrical, inserting right node is equivalent to inserting left node.
 
-Next, we introduce how to rebalance inserting node in left subtree.
+  Next, we introduce how to rebalance inserting node in left subtree.
 
-First, if parent is left child and i am right child.
+  First, if parent is left child and i am right child.
 
-![insert_lr](./data/insert_lr.png)
+<img src="./data/insert_lr.png" alt="insert right child in left subtree">
 
-If we do right rotation directly, my new parent is still red.
 
-We can rotate subtree that root is parent first, then the situation is as follow.
+  If we do right rotation directly, my new parent is still red.
+
+  We can rotate subtree that root is parent first, then the situation is as follow.
 
 ![insert_lr_left_rotate](./data/insert_lr_left_rotate.png)
 
-I am left child and my parent is left child now. It is same as inserting left node with left parent.
+  I am left child and my parent is left child now. It is same as inserting left node with left parent.
 
 ![insert_ll](./data/insert_ll.png)
 
-Rotating root of grandparent, the tree will be balance.
+  Rotating root of grandparent, the tree will be balance.
 
 ![insert_ll_right_rotate](./data/insert_ll_right_rotate.png)
 
 ## Deletion
 
 
-###Core 
+### Core 
 
 ## Reference
 
