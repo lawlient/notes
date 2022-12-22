@@ -2,11 +2,11 @@
 
 ## Definition
 
-1. Every node has a color either red or black.
-2. The root of the tree is always black.
-3. There are no two adjacent red nodes (A red node cannot have a red parent or red child).
-4. Every path from a node (including root) to any of its descendants NULL nodes has the same number of black nodes.
-5. All leaf nodes are black nodes.
+1. A node is either red or black
+2. The root is black
+3. All leaves (NULL) are black
+4. Both children of every red node are black
+5. Every simple path from root to leaves contains the same number of black nodes.
 
 ## Insertion
 
@@ -67,6 +67,33 @@
 
 
 ### Core 
+
+Look at brother node. Make situation as :
+  1. brother is black
+  2. the child of brother nearly me is black
+  3. the child of brother far away from me is red
+Then, make parent black and rotate at parent, the less of height is compensated, replace brother's color with parent. 
+For the child of brother nearly me, the color of it's new parent is still black, height keep still.
+For the child of brother far away from me, it's height is reduce 1 cause of rotate, making it black compensate for reducing.
+
+
+####
+
+Brother is red. Rotate at parent, new brother will be black.
+
+
+####
+
+Both child of brother is black. Making brother red to transfer less of black node to parent, solving it recursively.
+
+####
+
+The child of brother nearly me is red. Rotate at brother，it is going to be next.
+
+####
+
+The child of brother nearly me is black. It will be the situation descript in ![Core Chapter](#### Core)
+
 
 ## Reference
 
