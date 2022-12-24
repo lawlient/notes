@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../memory_pool/xpool.h"
 
 static void rbtree_rotate_left(rbtree_t* tree, rbtree_node_t* node);
 static void rbtree_rotate_right(rbtree_t* tree, rbtree_node_t* node);
@@ -340,6 +341,12 @@ int main() {
     rbtree_node_t nil;
     rbtree_init(&tree, &nil);
 
+    memory_pool_t* pool = mp_create(1 * 1024 * 1024 * 1024);
+    if (pool == NULL) {
+        fputs("create memory pool fail\n", stdout);
+        return 0; 
+    }
+
     fputs("TEST INSERTION NOW\n", stdout);
     key_t input;
     while (1){
@@ -348,7 +355,7 @@ int main() {
         scanf("%d", &input);
         if (input == -1) break;
 
-        rbtree_node_t* n = malloc(sizeof(rbtree_node_t));
+        rbtree_node_t* n = mp_alloc(pool, sizeof(rbtree_node_t));
         if (n == NULL) {
             fputs("malloc fail\n", stdout);
             exit(1);
@@ -373,6 +380,12 @@ int main() {
         rbtree_delete(&tree, n);
         rbtree_print(&tree);
     }
+
+    mp_destroy(pool);
+
+    fputs("press any key to exit\n", stdout);
+    scanf("%d", &input);
+    return 0;
 }
 
 
