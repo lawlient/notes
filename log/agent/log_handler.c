@@ -36,6 +36,27 @@ int handle_register(AsyncLog *this, LogItem *log) {
 
 int handle_log(AsyncLog *this, LogItem *log) {
     if (!magic_valid(log)) return 1;
+    int index = module_hash(log->path);
+    Module *module = &this->module[index];
+
+    char filename[300];
+    snprintf(filename, 300, "/data/log/%s/", module->item.path);
+    char timename[50];
+    time_t now = time(0);
+    struct tm tm;
+    gmtime_r(&now, &tm);
+    strftime(timename, 50, "%F-%H", &tm);
+    strncat(filename, timename, 50);
+    FILE* fd = fopen(filename, "w+");
+    if (fd == NULL) {
+        printf("open %s fail\n", filename);
+        return 4;
+    }
+
+    fprintf(fd, "%s", log->data);
+    fflush(fd);
+    fclose(fd);
+
     return 0;
 }
 

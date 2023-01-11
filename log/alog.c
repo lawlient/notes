@@ -21,14 +21,23 @@ AsyncLog *AsyncLog_new() {
         perror(" shmat fail");
         exit(errno);
     }
+    memset(shmm, 0, SHMM_SIZE);
 
     AsyncLog *alog = shmm;
+    alog->header.magic = SHMM_MAGIC;
+    alog->header.head  = 0;
+    alog->header.tail  = 0;
+    alog->header.len   = (char*)shmm + SHMM_SIZE - alog->body;
+    alog->header.reset = 0;
     return alog;
 }
 
 AsyncLog *AsyncLog_attach() {
     int shmmid = shmget(SHMM_KEY, 0, IPC_CREAT | 0666);
-    if (-1 == shmmid) return NULL;
+    if (-1 == shmmid) {
+        printf("%ld shmm not found", SHMM_KEY);
+        return NULL;
+    }
 
     void *shmm = shmat(shmmid, NULL, 0);
     if (shmm == (void *)-1) {
@@ -52,7 +61,7 @@ int AsyncLog_delete() {
  */
 LogItem *AsyncLog_enqueue(AsyncLog *this, int len) {
     LogItem *log = (LogItem *)this->body + this->header.head;
-    this->header.head += sizeof(LogItem) + len;
+    this->header.head += len;
     return log;
 }
 

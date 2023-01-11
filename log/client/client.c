@@ -10,12 +10,18 @@ int main(int argc, char *argv[]) {
         printf("init log fail\n");
         return 0;
     }
+    int err = Log_register(log);
+    if (err) {
+        perror("log register error");
+        exit(err);
+    }
 
-    do {
+    return 0;
+    //do {
         LOG(log, 1, "%s", "this is a test log");
 
         sleep(3);
-    } while (1);
+    // } while (1);
 
 
 }

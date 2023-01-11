@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 #include <assert.h>
 #include <unistd.h>
 
@@ -14,6 +15,7 @@
 
 #define SHMM_KEY      0x0002047a
 #define SHMM_SIZE  (1 << 13)
+#define SHMM_MAGIC 827
 #define LOG_MAGIC  88
 
 #define PATH_LEN   128

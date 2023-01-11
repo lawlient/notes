@@ -68,9 +68,25 @@ void run_consumer() {
 }
 
 void guard_consumer() {
+    FILE *log = fopen("/home/xujiuan/lawlient/notes/log/log", "w+");
     int cid, st;
     for (;;) {
         while ((cid = waitpid(-1, &st, WNOHANG)) > 0) {
+            if (log) {
+                if (WIFEXITED(st)) {
+                    fprintf(log, "exited, status=%d\n", WEXITSTATUS(st));
+                } else if (WIFSIGNALED(st)) {
+                    fprintf(log, "killed by signal %d\n", WTERMSIG(st));
+                } else if (WIFSTOPPED(st)) {
+                    fprintf(log, "stopped by signal %d\n", WSTOPSIG(st));
+                } else if (WIFCONTINUED(st)) {
+                    fprintf(log, "continued\n");
+                } else if (WCOREDUMP(st)) {
+                    fprintf(log, "coredump\n");
+                }
+                fclose(log);
+                return;
+            }
             run_consumer();
         }
         usleep(1000);
