@@ -47,7 +47,7 @@ int handle_log(AsyncLog *this, LogItem *log) {
     gmtime_r(&now, &tm);
     strftime(timename, 50, "%F-%H", &tm);
     strncat(filename, timename, 50);
-    FILE* fd = fopen(filename, "w+");
+    FILE* fd = fopen(filename, "a+");
     if (fd == NULL) {
         printf("open %s fail\n", filename);
         return 4;

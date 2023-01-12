@@ -10,22 +10,19 @@ void log_consumer() {
 
     do {
         if (AsyncLog_empty(glog)) {
-            // usleep(10 * 1000);
-            sleep(1);
+            usleep(10 * 1000);
             continue;
         }
 
-        sleep(3);
+        LogItem *log = AsyncLog_dequeue(glog);
+        if (NULL == log) {
+            usleep(10 * 1000);
+            continue;
+        }
 
-        /// LogItem *log = AsyncLog_dequeue(glog);
-        /// if (NULL == log) {
-        ///     usleep(10 * 1000);
-        ///     continue;
-        /// }
+        rc = AsyncLog_logger(glog, log);
 
-        /// rc = AsyncLog_logger(glog, log);
-
-        /// rc++;
+        rc++;
 
     } while (1);
 

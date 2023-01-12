@@ -13,8 +13,8 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-#define SHMM_KEY      0x0002047a
-#define SHMM_SIZE  (1 << 13)
+#define SHMM_KEY      0x2838bf25
+#define SHMM_SIZE  (1 << 23)  /* 8M */
 #define SHMM_MAGIC 827
 #define LOG_MAGIC  88
 

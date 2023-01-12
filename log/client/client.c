@@ -16,12 +16,11 @@ int main(int argc, char *argv[]) {
         exit(err);
     }
 
-    return 0;
-    //do {
+    do {
+
         LOG(log, 1, "%s", "this is a test log");
 
-        sleep(3);
-    // } while (1);
-
-
+        sleep (3);
+    } while (1);
+    return 0;
 }

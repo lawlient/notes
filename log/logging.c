@@ -43,7 +43,7 @@ int Log_register(Log *this) {
     size_t rsize = sizeof(LogItem) + sizeof(Item);
     LogItem *log = AsyncLog_enqueue(alog, rsize);
     if (NULL == log) return 1;
-    memset(log, 0, rsize);
+    // memset(log, 0, rsize);
     log->version = 0;
     log->magic = LOG_MAGIC;
     log->type  = REGISTER;
@@ -81,6 +81,7 @@ int Log_log(Log *this, Severity severity, const char* file, int line, const char
     size += vsnprintf(buf+size, len-1-size, fmt, ap);
     va_end(ap);
 
+    buf[size++] = '\n';  // append a cr
 
     AsyncLog *alog = this->shmm;
     LogItem *log = AsyncLog_enqueue(alog, sizeof(LogItem) + size);
