@@ -4,23 +4,20 @@
 
 
 void log_consumer() {
-    AsyncLog *glog = AsyncLog_new();
-    if (NULL == glog) return;
+    AsyncLog *alog = AsyncLog_new();
+    if (NULL == alog) return;
     int rc = 0;
 
     do {
-        if (AsyncLog_empty(glog)) {
+        LogItem *log = AsyncLog_peekqueue(alog);
+        if (NULL == log /* empty */) {
             usleep(10 * 1000);
             continue;
         }
 
-        LogItem *log = AsyncLog_dequeue(glog);
-        if (NULL == log) {
-            usleep(10 * 1000);
-            continue;
-        }
+        rc = AsyncLog_logger(alog, log);
 
-        rc = AsyncLog_logger(glog, log);
+        AsyncLog_dequeue(alog);
 
         rc++;
 

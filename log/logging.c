@@ -25,11 +25,12 @@ const char *kSeverityName[] = {
 
 
 
-Log *Log_new(Severity severity, int max, const char* path) {
+Log *Log_new(Severity severity, int id, int max, const char* path) {
     assert(path);
     Log *log = malloc(sizeof(Log));
     if (NULL == log) return NULL;
     log->severity = severity;
+    log->id       = id;
     log->max      = max;
     strncpy((char *)log->path, path, PATH_LEN);
     log->shmm = NULL;
@@ -43,25 +44,27 @@ int Log_register(Log *this) {
     size_t rsize = sizeof(LogItem) + sizeof(Item);
     LogItem *log = AsyncLog_enqueue(alog, rsize);
     if (NULL == log) return 1;
-    // memset(log, 0, rsize);
+    memset(log, 0, rsize);
+    log->flag  = WRITING;
     log->version = 0;
     log->magic = LOG_MAGIC;
     log->type  = REGISTER;
     log->len   = sizeof(Item);
+    log->id    = this->id;
 
     Item *item = (Item *)log->data;
     strncpy(item->path, this->path, PATH_LEN);
-    item->valid = 1;
     item->max = this->max;
     item->level = this->severity;
+
+    sbarrier();
+    log->flag = READABLE;
     return 0;
 }
 
 
 int Log_log(Log *this, Severity severity, const char* file, int line, const char* func, const char *fmt, ...) {
-    if (!Log_severity_valid(severity)) {
-        return 1;
-    }
+    if (!Log_severity_valid(severity)) return 1;
     if (this->shmm == NULL) {
         Log_attach(this);
         if (this->shmm == NULL) {
@@ -69,6 +72,10 @@ int Log_log(Log *this, Severity severity, const char* file, int line, const char
             return 2;
         }
     }
+    AsyncLog *alog = this->shmm;
+    if (alog->header.reset) return 3;
+    if (alog->module.stat[this->id].registered == 0) return 4;
+    if (alog->module.stat[this->id].full) return 5;
 
 
     const int len = 1024;
@@ -83,20 +90,21 @@ int Log_log(Log *this, Severity severity, const char* file, int line, const char
 
     buf[size++] = '\n';  // append a cr
 
-    AsyncLog *alog = this->shmm;
-    LogItem *log = AsyncLog_enqueue(alog, sizeof(LogItem) + size);
-    log->len = size;
-    log->magic = LOG_MAGIC;
-    log->type = LOG;
+    LogItem *log = AsyncLog_enqueue(alog, size);
+    if (!log) return 6;
+
+    log->flag    = WRITING;
     log->version = 0;
-    log->flag = 0;
-    memcpy(log->path, this->path, PATH_LEN);
-    memcpy(log->data, buf, size);
+    log->magic   = LOG_MAGIC;
+    log->type    = LOG;
+    log->id      = this->id;
+    log->len     = size;
+    memcpy(log->data, buf, log->len);
+
+    sbarrier();
+    log->flag = 'r';
     return 0;
 }
-
-
-
 
 
 

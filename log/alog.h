@@ -13,13 +13,19 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 
-#define SHMM_KEY      0x2838bf25
+#define SHMM_KEY   0x2838bf25
 #define SHMM_SIZE  (1 << 23)  /* 8M */
 #define SHMM_MAGIC 827
-#define LOG_MAGIC  88
-
+#define LOG_MAGIC  27
 #define PATH_LEN   128
-#define ITEM_SIZE   (1 << 10)
+#define MODUSIZE   (1 << 10)
+
+#define LOG_PREFIX "/data/log/"
+
+
+#define sbarrier() __asm__ __volatile__("sfence" :: : "memory")
+#define lbarrier() __asm__ __volatile__("lfence" :: : "memory")
+#define CAS(m, o, n) __sync_bool_compare_and_swap(&(m), (o), (n))
 
 typedef struct Header_ {
     int magic;      // 用于生产者attach时简单校验
@@ -31,10 +37,9 @@ typedef struct Header_ {
 
 
 typedef struct Item_ {
-    char path[PATH_LEN];    // 日志路径【不包含前缀】
-    int valid;              // 
     int max;                // 单文件日志byte上限
     int level;              // 日志等级
+    char path[PATH_LEN];    // 日志路径【不包含前缀】
 } Item;
 
 typedef struct State_ {
@@ -43,31 +48,35 @@ typedef struct State_ {
 } State;
 
 typedef struct Module_ {
-    Item item;
-    State stat;
+    Item item[MODUSIZE];
+    State stat[MODUSIZE];
 } Module;
-
-typedef struct AsyncLog_ {
-    Header header;
-    Module module[ITEM_SIZE];
-    char   body[];
-} AsyncLog;
 
 
 typedef enum LogType_ {
-    REGISTER  =  0,
-    LOG       =  1,
+    IDLE      =  0,
+    REGISTER  =  1,
+    LOG       =  2,
 } LogType;
 
+#define WRITING     'w'
+#define READABLE    'r'
+
 typedef struct LogItem_ {
+    uint8_t flag;              // 'w': writing, 'r': readable
     uint8_t version;
-    uint8_t flag;
-    uint8_t magic;
-    uint8_t type;
-    char path[PATH_LEN];
+    int8_t magic;
+    int8_t type;
+    uint16_t id;
     uint16_t len;
     char    data[];
 } LogItem;
+
+typedef struct AsyncLog_ {
+    Header header;
+    Module module;
+    char   body[];
+} AsyncLog;
 
 
 AsyncLog *AsyncLog_new();
@@ -75,10 +84,13 @@ AsyncLog *AsyncLog_attach();
 int AsyncLog_delete();
 
 
+
 /* 修改head指针，获取指定长度的队列空间 */
 LogItem *AsyncLog_enqueue(AsyncLog *this, int len);
-/* 修改tail指针，获取一条log */
-LogItem *AsyncLog_dequeue(AsyncLog *this);
+/* 获取一条log， 不修改tail指针 */
+LogItem *AsyncLog_peekqueue(AsyncLog *this);
+/* 修改tail指针 */
+void AsyncLog_dequeue(AsyncLog *this);
 int AsyncLog_empty(AsyncLog *this);
 
 

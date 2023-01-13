@@ -1,14 +1,22 @@
 #include "log_agent.h"
 
+#define BUFSIZE 256
 
+int fds[MODUSIZE] = {0};
 
 static inline int magic_valid(LogItem *log);
+
+static int prepare_logfile(AsyncLog *this, int id);
+
+static int AsyncLog_filename(AsyncLog *this, int id, char buf[], int len);
+
+
 static int handle_register(AsyncLog *this, LogItem *log);
 static int handle_log(AsyncLog *this, LogItem *log);
 
-
 int AsyncLog_logger(AsyncLog *this, LogItem *log) {
     switch (log->type) {
+    case IDLE: return 0;
     case REGISTER: return handle_register(this, log);
     case LOG: return handle_log(this, log);
     default: break;
@@ -19,45 +27,70 @@ int AsyncLog_logger(AsyncLog *this, LogItem *log) {
 int handle_register(AsyncLog *this, LogItem *log) {
     if (!magic_valid(log)) return 1;
     if (log->len != sizeof(Item)) return 2;
-    const Item *item = (Item *)log->data;
+    const Item *ritem = (Item *)log->data;
 
-    log->path[PATH_LEN - 1] = '\0';
-    int index = module_hash(log->path);
-    Module *module = &this->module[index];
-    module->item.level = item->level;
-    module->item.max = item->max;
-    strncpy(module->item.path, item->path, PATH_LEN);
-    module->item.valid = item->valid;
+    Item *item = &this->module.item[log->id];
+    memcpy(item, ritem, sizeof(Item));
 
-    module->stat.full = 0;
-    module->stat.registered = 1;
+    State *stat = &this->module.stat[log->id];
+    stat->full  = 0;
+    stat->registered = 1;
     return 0;
 }
 
 int handle_log(AsyncLog *this, LogItem *log) {
     if (!magic_valid(log)) return 1;
-    int index = module_hash(log->path);
-    Module *module = &this->module[index];
+    if (log->id < 0 || log->id >= MODUSIZE) return 2;
 
-    char filename[300];
-    snprintf(filename, 300, "/data/log/%s/", module->item.path);
-    char timename[50];
-    time_t now = time(0);
-    struct tm tm;
-    gmtime_r(&now, &tm);
-    strftime(timename, 50, "%F-%H", &tm);
-    strncat(filename, timename, 50);
-    FILE* fd = fopen(filename, "a+");
-    if (fd == NULL) {
-        printf("open %s fail\n", filename);
-        return 4;
+    if (prepare_logfile(this, log->id)) {
+        return 5;
     }
 
-    fprintf(fd, "%s", log->data);
-    fflush(fd);
-    fclose(fd);
+    ModuleCache *mc = &mcaches[log->id];
+    write(mc->fd, log->data, log->len);
 
     return 0;
 }
 
 int magic_valid(LogItem *log) { return log->magic == LOG_MAGIC; }
+
+
+int prepare_logfile(AsyncLog *this, int id) {
+    Item *item   = &this->module.item[id];
+
+    ModuleCache *mc = &mcaches[id];
+    char filename[BUFSIZE];
+    AsyncLog_filename(this, id, filename, BUFSIZE);
+
+    struct stat st;
+    if (stat(filename, &st) && st.st_ino == mc->inode) {
+        return 0;
+    }
+
+    if (mc->fd) {
+        close(mc->fd);
+        mc->fd = -1;
+    }
+
+    mc->fd = open(item->path, O_APPEND | O_CREAT | O_RDWR, 0666);
+    if (mc->fd == -1) {
+        return 1;
+    }
+
+    if (fstat(mc->fd, &st)) {
+        mc->inode = st.st_ino;
+    }
+
+    return 0;
+}
+
+int AsyncLog_filename(AsyncLog *this, int id, char buf[], int len) {
+    Item *item   = &this->module.item[id];
+    int size = 0;
+    size += snprintf(buf, len, LOG_PREFIX"%s/", item->path);
+    time_t now = time(0);
+    struct tm tm;
+    gmtime_r(&now, &tm);
+    size += strftime(buf+size, len-size, "%F-%H.log", &tm);
+    return size;
+}

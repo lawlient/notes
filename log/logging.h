@@ -24,12 +24,13 @@ extern const char *kSeverityName[];
 
 typedef struct Log_ {
     Severity severity;
+    int id;
     int max;
     const char path[PATH_LEN];
     void *shmm;
 } Log;
 
-Log *Log_new(Severity severity, int max, const char* path);
+Log *Log_new(Severity severity, int id, int max, const char* path);
 
 /* send register log to queue */
 int Log_register(Log *this);

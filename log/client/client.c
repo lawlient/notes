@@ -5,7 +5,7 @@
 
 
 int main(int argc, char *argv[]) {
-    Log *log = Log_new(0, 1024, "log_test_client");
+    Log *log = Log_new(0, 0, 1024, "log_test_client");
     if (!log) {
         printf("init log fail\n");
         return 0;
