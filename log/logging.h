@@ -33,10 +33,10 @@ typedef struct Log_ {
 Log *Log_new(Severity severity, int id, int max, const char* path);
 
 /* send register log to queue */
-int Log_register(Log *this);
+log_err_t Log_register(Log *this);
 
 /* send normal log to queue */
-int Log_log(Log *this, Severity severity, const char* file, int line, const char* func, const char *fmt, ...);
+log_err_t Log_log(Log *this, Severity severity, const char* file, int line, const char* func, const char *fmt, ...);
 
 
 

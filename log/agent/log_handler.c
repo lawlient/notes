@@ -6,7 +6,7 @@ int fds[MODUSIZE] = {0};
 
 static inline int magic_valid(LogItem *log);
 
-static int prepare_logfile(AsyncLog *this, int id);
+static int check_file(AsyncLog *this, int id);
 
 static int AsyncLog_filename(AsyncLog *this, int id, char buf[], int len);
 
@@ -33,15 +33,17 @@ int handle_register(AsyncLog *this, LogItem *log) {
     memcpy(item, ritem, sizeof(Item));
 
     State *stat = &this->module.stat[log->id];
-    stat->full  = 0;
     stat->registered = 1;
+
+    check_file(this, log->id);
     return 0;
 }
 
 int handle_log(AsyncLog *this, LogItem *log) {
     if (log->id < 0 || log->id >= MODUSIZE) return 2;
 
-    if (prepare_logfile(this, log->id)) {
+    int err = check_file(this, log->id);
+    if (err) {
         return 5;
     }
 
@@ -54,19 +56,31 @@ int handle_log(AsyncLog *this, LogItem *log) {
 int magic_valid(LogItem *log) { return log->magic == LOG_MAGIC; }
 
 
-int prepare_logfile(AsyncLog *this, int id) {
+int check_file(AsyncLog *this, int id) {
     ModuleCache *mc = &mcaches[id];
+    Item *item      = &this->module.item[id];
+    State *state    = &this->module.stat[id];
+
     char filename[BUFSIZE];
     AsyncLog_filename(this, id, filename, BUFSIZE);
 
     struct stat st;
-    if (stat(filename, &st) && st.st_ino == mc->inode) {
+    if (!stat(filename, &st) && st.st_ino == mc->inode) {
+        if (st.st_size >= item->max) {
+            if (!state->full) {
+                dprintf(mc->fd, "size of the log file is huge than %d\n", item->max);
+                state->full = 1;
+            }
+            return 8;
+        }
+        state->full = 0;
         return 0;
     }
 
     if (mc->fd) {
         close(mc->fd);
         mc->fd = -1;
+        state->full = 0;
     }
 
     mc->fd = open(filename, O_APPEND | O_CREAT | O_RDWR, 0666);
@@ -80,7 +94,7 @@ int prepare_logfile(AsyncLog *this, int id) {
             return 1;
     }
 
-    if (fstat(mc->fd, &st)) {
+    if (!fstat(mc->fd, &st)) {
         mc->inode = st.st_ino;
     }
 

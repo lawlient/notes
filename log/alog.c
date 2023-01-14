@@ -10,12 +10,12 @@
 static AsyncLog *AsyncLog_reset(AsyncLog *this);
 
 static const LogItem kLogItem = {
-    .flag = 'r',
-    .version = 0,
-    .magic = LOG_MAGIC,
-    .type = IDLE,
-    .id = MODUSIZE,
-    .len = 0,
+    .flag     = READABLE,
+    .version  = 0,
+    .magic    = LOG_MAGIC,
+    .type     = IDLE,       /* do nothing   */
+    .id       = MODUSIZE,   /* out of range */
+    .len      = 0,          /* no data      */
 };
 
 
@@ -36,11 +36,11 @@ AsyncLog *AsyncLog_new() {
 }
 
 AsyncLog *AsyncLog_reset(AsyncLog *this) {
-    memset(this, 0, SHMM_SIZE);
     this->header.magic = SHMM_MAGIC;
     this->header.head  = 0;
     this->header.tail  = 0;
-    this->header.len   = (char*)this + SHMM_SIZE - this->body - sizeof(LogItem);
+    this->header.len   = (char*)this + SHMM_SIZE - this->body;
+    this->header.len  -= sizeof(LogItem); /* protect region */
     this->header.reset = 0;
     return this;
 }
@@ -62,34 +62,39 @@ int AsyncLog_delete() {
     return 0;
 }
 
-/* todo: 
- * 1. cas
- * 2. circle
- */
-LogItem *AsyncLog_enqueue(AsyncLog *this, int len) {
+log_err_t AsyncLog_enqueue(AsyncLog *this, int len, LogItem **log) {
     int try = 0;
     int hsize = sizeof(LogItem);
     int ctail = 0, ntail = 0;
     do {
-        if (try++ > 10) return NULL;
+        if (try++ > 10) {
+            *log = NULL;
+            return E_CAS_FAIL;
+        }
         ctail = this->header.tail;
         ntail = ctail + hsize + len;
         if (ntail > this->header.len) {
+            /* reach protect region */
             if (this->header.head < hsize + len) {
-                return NULL;
+                /* space from body is not satisfied supply */
+                *log = NULL;
+                return E_QUEUE_FULL;
             }
+
+            /* start from body again */
             ntail = hsize + len;
         }
     } while (!CAS(this->header.tail, ctail, ntail));
 
     if (ntail == hsize + len) {
+        /* set a default LogItem with 0 len */
         memcpy(this->body + ctail, &kLogItem, sizeof(kLogItem));
-        LogItem *log = (LogItem *)(this->body);
-        return log;
+        *log = (LogItem *)(this->body);
+        return E_OK;
     }
 
-    LogItem *log = (LogItem *)(this->body + ctail);
-    return log;
+    *log = (LogItem *)(this->body + ctail);
+    return E_OK;
 }
 
 LogItem *AsyncLog_peekqueue(AsyncLog *this) {

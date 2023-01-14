@@ -19,8 +19,8 @@ const char *kSeverityName[] = {
     "info",
     "warning",
     "error",
+    NULL,
 };
-
 
 
 
@@ -37,60 +37,71 @@ Log *Log_new(Severity severity, int id, int max, const char* path) {
     return log;
 }
 
-int Log_register(Log *this) {
+log_err_t Log_register(Log *this) {
+    log_err_t err = E_OK;
     Log_attach(this);
     AsyncLog *alog = this->shmm;
-    size_t rsize = sizeof(Item);
-    LogItem *log = AsyncLog_enqueue(alog, rsize);
-    if (NULL == log) return 1;
-    memset(log, 0, rsize);
-    log->flag  = WRITING;
-    log->version = 0;
-    log->magic = LOG_MAGIC;
-    log->type  = REGISTER;
-    log->len   = sizeof(Item);
-    log->id    = this->id;
 
-    Item *item = (Item *)log->data;
+    LogItem *log = NULL; 
+    err = AsyncLog_enqueue(alog, sizeof(Item), &log);
+    if (err) {
+        return err;
+    }
+
+    log->flag    = WRITING;
+    log->version = 0;
+    log->magic   = LOG_MAGIC;
+    log->type    = REGISTER;
+    log->len     = sizeof(Item);
+    log->id      = this->id;
+
+    Item *item  = (Item *)log->data;
     strncpy(item->path, this->path, PATH_LEN);
-    item->max = this->max;
+    item->max   = this->max;
     item->level = this->severity;
 
     sbarrier();
     log->flag = READABLE;
-    return 0;
+    return E_OK;
 }
 
 
-int Log_log(Log *this, Severity severity, const char* file, int line, const char* func, const char *fmt, ...) {
-    if (!Log_severity_valid(severity)) return 1;
+log_err_t Log_log(Log *this, Severity severity, const char* file, int line, const char* func, const char *fmt, ...) {
+    if (!Log_severity_valid(severity)) 
+        return E_INVALID_LEVEL;
+
     if (this->shmm == NULL) {
         Log_attach(this);
         if (this->shmm == NULL) {
-            /* todo syslog */
-            return 2;
+            return E_NOT_ATTACH;
         }
     }
     AsyncLog *alog = this->shmm;
-    if (alog->header.reset) return 3;
-    if (alog->module.stat[this->id].registered == 0) return 4;
-    if (alog->module.stat[this->id].full) return 5;
+
+    if (alog->header.reset) 
+        return E_SHMM_RESETING;
+    if (alog->module.stat[this->id].registered == 0) 
+        return E_MODULE_NOT_REG;
+    if (alog->module.stat[this->id].full)
+        return E_MODULE_FULL;
 
 
-    const int len = 1024;
-    char buf[len];
+    char buf[LOG_LINE_LEN];
     uint16_t size = 0;
-    size += Log_prefix(severity, file, line, func, buf, len-1);
+    size += Log_prefix(severity, file, line, func, buf, LOG_LINE_LEN-1);
 
     va_list ap;
     va_start(ap, fmt);
-    size += vsnprintf(buf+size, len-1-size, fmt, ap);
+    size += vsnprintf(buf+size, LOG_LINE_LEN-1-size, fmt, ap);
     va_end(ap);
 
     buf[size++] = '\n';  // append a cr
 
-    LogItem *log = AsyncLog_enqueue(alog, size);
-    if (!log) return 6;
+    LogItem *log = NULL;
+    log_err_t err = AsyncLog_enqueue(alog, size, &log);
+    if (err) {
+        return err;
+    }
 
     log->flag    = WRITING;
     log->version = 0;
@@ -101,45 +112,38 @@ int Log_log(Log *this, Severity severity, const char* file, int line, const char
     memcpy(log->data, buf, log->len);
 
     sbarrier();
-    log->flag = 'r';
-    return 0;
+    log->flag = READABLE;
+    return E_OK;
 }
-
-
 
 
 void Log_attach(Log *this) { if (!this->shmm) this->shmm = AsyncLog_attach(); }
 
+
+/* return : writen size */
 int Log_prefix(Severity severity, const char* file, int line, const char* func,
                char buf[], size_t len) {
-    char *p =  buf;
+    int size = 0; /* used size */
 
     /* time */
     time_t now = time(0);
     struct tm tm;
     localtime_r(&now, &tm);
-    strftime(p, len, "%F %T ", &tm); len -= 20;
-    p += 20;
+    size += strftime(buf, len, "%F %T ", &tm);
 
     /* level */
     if (Log_severity_valid(severity)) {
         const char* lname = kSeverityName[severity];
-        size_t llen = strlen(lname);
-        strncpy(p, lname, llen);
-        len -= llen;
-        p += llen;
+        strncpy(buf + size, lname, len - size);
+        size += strlen(lname);
     }
 
     /* pid */
-    snprintf(p, len, " %5d", getpid()); p += 5; len -= 5;
-    // snprintf(p, len, " %5d", getpid()); p += 5;
+    size += snprintf(buf + size, len - size, " %5d", getpid());
 
     /* filename:line [funcname] */
-    snprintf(p, len, " %s:%5d [%s] ", file, line, func);
-    size_t poslen = strlen(file) + 5 + strlen(func) + 6;
-    len -= poslen;
-    p += poslen;
-    return p - buf; /* used size */
+    size += snprintf(buf + size, len - size, " %s:%5d [%s] ", file, line, func);
+    return size;
 }
 
 inline int Log_severity_valid(Severity s) { return s >= 0 && s < Smax; }

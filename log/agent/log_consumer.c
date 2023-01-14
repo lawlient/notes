@@ -11,7 +11,7 @@ void log_consumer() {
     do {
         LogItem *log = AsyncLog_peekqueue(alog);
         if (NULL == log /* empty */) {
-            usleep(10 * 1000);
+            usleep(1 * 1000);
             continue;
         }
 

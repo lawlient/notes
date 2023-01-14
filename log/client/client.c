@@ -2,24 +2,27 @@
 
 #include "logging.h"
 
+#define KB (1 << 10)
+#define MB (1 << 20)
 
 
 int main(int argc, char *argv[]) {
-    if (argc < 3) {
+    if (argc < 4) {
         printf("Usage: %s id module_path\n", argv[0]);
         return 0;
     }
 
     int id = atoi(argv[1]);
     const char* module = argv[2];
+    int max = atoi(argv[3]);
 
-    Log *log = Log_new(0, id, 1024, module);
+    Log *log = Log_new(0, id, max * KB, module);
     if (!log) {
         printf("init log fail\n");
         return 0;
     }
 
-    int err = 1;
+    log_err_t err = E_MODULE_NOT_REG;
     do {
 
         if (err) 
