@@ -5,22 +5,36 @@
 
 
 int main(int argc, char *argv[]) {
-    Log *log = Log_new(0, 0, 1024, "log_test_client");
+    if (argc < 3) {
+        printf("Usage: %s id module_path\n", argv[0]);
+        return 0;
+    }
+
+    int id = atoi(argv[1]);
+    const char* module = argv[2];
+
+    Log *log = Log_new(0, id, 1024, module);
     if (!log) {
         printf("init log fail\n");
         return 0;
     }
-    int err = Log_register(log);
-    if (err) {
-        perror("log register error");
-        exit(err);
-    }
 
+    int err = 1;
     do {
 
-        LOG(log, 1, "%s", "this is a test log");
+        if (err) 
+            err = Log_register(log);
+        if (err) {
+            perror("log register error");
+            exit(err);
+        }
 
-        sleep (3);
+
+        err = LOG(log, 1, "this is log test client, id: %d, path: %s", id, module);
+
+        sleep (1);
+
     } while (1);
+
     return 0;
 }

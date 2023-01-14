@@ -13,4 +13,4 @@ test: $(TEST_SRC) alog.c logging.c
 	gcc -g -Wall $(INC) $(TEST_SRC) alog.c logging.c -o test
 
 clean:
-	rm core test log_agent
+	rm core test log_agent log

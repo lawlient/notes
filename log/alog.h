@@ -8,6 +8,8 @@
 #include <time.h>
 #include <assert.h>
 #include <unistd.h>
+#include <errno.h>
+#include <libgen.h>
 
 #include <sys/stat.h>
 #include <sys/wait.h>

@@ -15,6 +15,7 @@ static int handle_register(AsyncLog *this, LogItem *log);
 static int handle_log(AsyncLog *this, LogItem *log);
 
 int AsyncLog_logger(AsyncLog *this, LogItem *log) {
+    if (!magic_valid(log)) return 1;
     switch (log->type) {
     case IDLE: return 0;
     case REGISTER: return handle_register(this, log);
@@ -25,7 +26,6 @@ int AsyncLog_logger(AsyncLog *this, LogItem *log) {
 }
 
 int handle_register(AsyncLog *this, LogItem *log) {
-    if (!magic_valid(log)) return 1;
     if (log->len != sizeof(Item)) return 2;
     const Item *ritem = (Item *)log->data;
 
@@ -39,7 +39,6 @@ int handle_register(AsyncLog *this, LogItem *log) {
 }
 
 int handle_log(AsyncLog *this, LogItem *log) {
-    if (!magic_valid(log)) return 1;
     if (log->id < 0 || log->id >= MODUSIZE) return 2;
 
     if (prepare_logfile(this, log->id)) {
@@ -56,8 +55,6 @@ int magic_valid(LogItem *log) { return log->magic == LOG_MAGIC; }
 
 
 int prepare_logfile(AsyncLog *this, int id) {
-    Item *item   = &this->module.item[id];
-
     ModuleCache *mc = &mcaches[id];
     char filename[BUFSIZE];
     AsyncLog_filename(this, id, filename, BUFSIZE);
@@ -72,9 +69,15 @@ int prepare_logfile(AsyncLog *this, int id) {
         mc->fd = -1;
     }
 
-    mc->fd = open(item->path, O_APPEND | O_CREAT | O_RDWR, 0666);
-    if (mc->fd == -1) {
-        return 1;
+    mc->fd = open(filename, O_APPEND | O_CREAT | O_RDWR, 0666);
+    if (mc->fd == -1 && errno == ENOENT) {
+        int err = mkdir(dirname(filename), 0755); 
+        if (err)
+            return 1;
+
+        mc->fd = open(filename, O_APPEND | O_CREAT | O_RDWR, 0666);
+        if (mc->fd == -1)
+            return 1;
     }
 
     if (fstat(mc->fd, &st)) {
@@ -90,7 +93,7 @@ int AsyncLog_filename(AsyncLog *this, int id, char buf[], int len) {
     size += snprintf(buf, len, LOG_PREFIX"%s/", item->path);
     time_t now = time(0);
     struct tm tm;
-    gmtime_r(&now, &tm);
+    localtime_r(&now, &tm);
     size += strftime(buf+size, len-size, "%F-%H.log", &tm);
     return size;
 }

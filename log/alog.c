@@ -71,22 +71,24 @@ LogItem *AsyncLog_enqueue(AsyncLog *this, int len) {
     int hsize = sizeof(LogItem);
     int ctail = 0, ntail = 0;
     do {
-        if (try++ <= 10) break;
+        if (try++ > 10) return NULL;
         ctail = this->header.tail;
         ntail = ctail + hsize + len;
         if (ntail > this->header.len) {
             if (this->header.head < hsize + len) {
                 return NULL;
             }
-            ntail = 0;
+            ntail = hsize + len;
         }
     } while (!CAS(this->header.tail, ctail, ntail));
 
-    if (ntail == 0) {
+    if (ntail == hsize + len) {
         memcpy(this->body + ctail, &kLogItem, sizeof(kLogItem));
+        LogItem *log = (LogItem *)(this->body);
+        return log;
     }
 
-    LogItem *log = (LogItem *)(this->body + this->header.tail);
+    LogItem *log = (LogItem *)(this->body + ctail);
     return log;
 }
 

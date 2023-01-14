@@ -38,10 +38,9 @@ Log *Log_new(Severity severity, int id, int max, const char* path) {
 }
 
 int Log_register(Log *this) {
-    if (this->shmm) return 0;
     Log_attach(this);
     AsyncLog *alog = this->shmm;
-    size_t rsize = sizeof(LogItem) + sizeof(Item);
+    size_t rsize = sizeof(Item);
     LogItem *log = AsyncLog_enqueue(alog, rsize);
     if (NULL == log) return 1;
     memset(log, 0, rsize);
