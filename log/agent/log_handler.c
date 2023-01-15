@@ -2,61 +2,79 @@
 
 #define BUFSIZE 256
 
+typedef struct ModuleCache_ {
+    int fd;
+    ino_t inode;
+} ModuleCache;
+
+ModuleCache mcaches[MODUSIZE];
+
 int fds[MODUSIZE] = {0};
 
-static inline int magic_valid(LogItem *log);
 
-static int check_file(AsyncLog *this, int id);
+static log_err_t check_file(AsyncLog *this, int id);
 
 static int AsyncLog_filename(AsyncLog *this, int id, char buf[], int len);
 
 
-static int handle_register(AsyncLog *this, LogItem *log);
-static int handle_log(AsyncLog *this, LogItem *log);
+typedef log_err_t (*Handle)(AsyncLog *this, LogItem *log);
 
-int AsyncLog_logger(AsyncLog *this, LogItem *log) {
-    if (!magic_valid(log)) return 1;
-    switch (log->type) {
-    case IDLE: return 0;
-    case REGISTER: return handle_register(this, log);
-    case LOG: return handle_log(this, log);
-    default: break;
-    }
-    return 3;
+static log_err_t handle_idle(AsyncLog *this, LogItem *log);
+static log_err_t handle_register(AsyncLog *this, LogItem *log);
+static log_err_t handle_log(AsyncLog *this, LogItem *log);
+
+
+static const Handle handlers[] = {
+    handle_idle,
+    handle_register,
+    handle_log,
+    NULL,
+};
+
+log_err_t AsyncLog_logger(AsyncLog *this, LogItem *log) {
+    if (log->flag != READABLE)
+        return E_LOG_WRITING;
+    lbarrier();
+    if (!Log_magic_valid(log)) 
+        return E_LOG_MAGIC_ERR;
+    if (!Log_type_valid(log->type)) 
+        return E_INVALID_LOGTYPE;
+
+    return handlers[log->type](this, log);
 }
 
-int handle_register(AsyncLog *this, LogItem *log) {
-    if (log->len != sizeof(Item)) return 2;
-    const Item *ritem = (Item *)log->data;
+log_err_t handle_idle(AsyncLog *this, LogItem *log) { return 0; }
 
+log_err_t handle_register(AsyncLog *this, LogItem *log) {
+    if (log->len != sizeof(Item)) 
+        return E_QUEUE_BROKEN;
+
+    const Item *ritem = (Item *)log->data;
     Item *item = &this->module.item[log->id];
     memcpy(item, ritem, sizeof(Item));
 
     State *stat = &this->module.stat[log->id];
     stat->registered = 1;
-
-    check_file(this, log->id);
     return 0;
 }
 
-int handle_log(AsyncLog *this, LogItem *log) {
-    if (log->id < 0 || log->id >= MODUSIZE) return 2;
+log_err_t handle_log(AsyncLog *this, LogItem *log) {
+    if (!Module_id_valid(log->id)) 
+        return E_MODULE_ID_ERR;
 
-    int err = check_file(this, log->id);
-    if (err) {
-        return 5;
-    }
+    log_err_t err = check_file(this, log->id);
+    if (err) 
+        return err;
 
     ModuleCache *mc = &mcaches[log->id];
     write(mc->fd, log->data, log->len);
 
-    return 0;
+    return E_OK;
 }
 
-int magic_valid(LogItem *log) { return log->magic == LOG_MAGIC; }
 
 
-int check_file(AsyncLog *this, int id) {
+log_err_t check_file(AsyncLog *this, int id) {
     ModuleCache *mc = &mcaches[id];
     Item *item      = &this->module.item[id];
     State *state    = &this->module.stat[id];
@@ -71,10 +89,10 @@ int check_file(AsyncLog *this, int id) {
                 dprintf(mc->fd, "size of the log file is huge than %d\n", item->max);
                 state->full = 1;
             }
-            return 8;
+            return E_LOG_FILE_FULL;
         }
         state->full = 0;
-        return 0;
+        return E_OK;
     }
 
     if (mc->fd) {
@@ -87,20 +105,21 @@ int check_file(AsyncLog *this, int id) {
     if (mc->fd == -1 && errno == ENOENT) {
         int err = mkdir(dirname(filename), 0755); 
         if (err)
-            return 1;
+            return E_CREAT_LOGDIR_FAIL;
 
         mc->fd = open(filename, O_APPEND | O_CREAT | O_RDWR, 0666);
         if (mc->fd == -1)
-            return 1;
+            return E_OPEN_LOG_FILE_FAIL;
     }
 
-    if (!fstat(mc->fd, &st)) {
+    if (!fstat(mc->fd, &st))
         mc->inode = st.st_ino;
-    }
 
-    return 0;
+    return E_OK;
 }
 
+/* 获取module当前对应的日志文件绝对路径名
+ * 返回：名字长度 */
 int AsyncLog_filename(AsyncLog *this, int id, char buf[], int len) {
     Item *item   = &this->module.item[id];
     int size = 0;

@@ -3,6 +3,7 @@
 
 
 #include "alog.h"
+#include "logging.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -13,21 +14,12 @@
 #define LOCKFILE "/data/services/log_agent/lock.pid"
 
 
-extern int AsyncLog_logger(AsyncLog *this, LogItem *log);
-
-extern int module_hash(const char *path);
+extern log_err_t AsyncLog_logger(AsyncLog *this, LogItem *log);
 
 /* 子进程消费共享内存循环队列中的日志记录 */
 extern void log_consumer();
 
 
-
-typedef struct ModuleCache_ {
-    int fd;
-    ino_t inode;
-} ModuleCache;
-
-ModuleCache mcaches[MODUSIZE];
 
 
 

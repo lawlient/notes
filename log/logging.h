@@ -18,8 +18,6 @@ typedef enum Severity_ {
     Smax,
 } Severity;
 
-extern const char *kSeverityName[];
-
 
 
 typedef struct Log_ {
@@ -38,6 +36,8 @@ log_err_t Log_register(Log *this);
 /* send normal log to queue */
 log_err_t Log_log(Log *this, Severity severity, const char* file, int line, const char* func, const char *fmt, ...);
 
+
+static inline int Log_severity_valid(Severity s) { return s >= 0 && s < Smax; }
 
 
 

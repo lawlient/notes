@@ -6,7 +6,7 @@
 void log_consumer() {
     AsyncLog *alog = AsyncLog_new();
     if (NULL == alog) return;
-    int rc = 0;
+    log_err_t err = E_OK;
 
     do {
         LogItem *log = AsyncLog_peekqueue(alog);
@@ -15,11 +15,11 @@ void log_consumer() {
             continue;
         }
 
-        rc = AsyncLog_logger(alog, log);
+        err = AsyncLog_logger(alog, log);
 
         AsyncLog_dequeue(alog);
 
-        rc++;
+        err++;
 
     } while (1);
 

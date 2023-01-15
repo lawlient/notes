@@ -10,7 +10,7 @@ log_agent: $(AGENT_SRC) alog.c logging.c
 
 
 test: $(TEST_SRC) alog.c logging.c
-	gcc -g -Wall $(INC) $(TEST_SRC) alog.c logging.c -o test
+	gcc -g -Wall $(INC) $(TEST_SRC) alog.c logging.c -o test -lpthread
 
 clean:
 	rm core test log_agent log

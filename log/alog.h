@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <libgen.h>
 
+#include <sys/time.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <sys/types.h>
@@ -63,6 +64,7 @@ typedef enum LogType_ {
     IDLE      =  0,
     REGISTER  =  1,
     LOG       =  2,
+    LOGMAX
 } LogType;
 
 typedef struct LogItem_ {
@@ -94,10 +96,10 @@ log_err_t AsyncLog_enqueue(AsyncLog *this, int len, LogItem **log);
 LogItem *AsyncLog_peekqueue(AsyncLog *this);
 /* 修改tail指针 */
 void AsyncLog_dequeue(AsyncLog *this);
-int AsyncLog_empty(AsyncLog *this);
 
-
-
-
+static inline int AsyncLog_empty(AsyncLog *this) { return (this->header.head == this->header.tail) ? 1 : 0; }
+static inline int Module_id_valid(int id) { return id >= 0 && id < MODUSIZE; }
+static inline int Log_type_valid(int type) { return type >= 0 && type < LOGMAX; }
+static inline int Log_magic_valid(LogItem* log) { return log->magic == LOG_MAGIC; }
 
 #endif

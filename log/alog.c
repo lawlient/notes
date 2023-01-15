@@ -114,6 +114,4 @@ void AsyncLog_dequeue(AsyncLog *this) {
     }
 }
 
-int AsyncLog_empty(AsyncLog *this) {
-    return (this->header.head == this->header.tail) ? 1 : 0;
-}
+

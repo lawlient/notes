@@ -9,20 +9,9 @@
 
 
 static void Log_attach(Log *this);
-static int Log_severity_valid(Severity s);
 static int Log_prefix(Severity severity, const char* file, int line, const char* func, char buf[], size_t len);
 
-
-
-const char *kSeverityName[] = {
-    "debug",
-    "info",
-    "warning",
-    "error",
-    NULL,
-};
-
-
+static const char *kSeverityName[] = { "debug  ", "info   ", "warning", "error  ", NULL, };
 
 
 Log *Log_new(Severity severity, int id, int max, const char* path) {
@@ -129,21 +118,22 @@ int Log_prefix(Severity severity, const char* file, int line, const char* func,
     time_t now = time(0);
     struct tm tm;
     localtime_r(&now, &tm);
-    size += strftime(buf, len, "%F %T ", &tm);
+    size += strftime(buf, len, "%F %T", &tm);
+
+    struct timeval msec;
+    gettimeofday(&msec, NULL);
+    size += snprintf(buf + size, len - size, ":%6ld ", msec.tv_usec);
 
     /* level */
     if (Log_severity_valid(severity)) {
-        const char* lname = kSeverityName[severity];
-        strncpy(buf + size, lname, len - size);
-        size += strlen(lname);
+        size += snprintf(buf + size, len - size, "%s ", kSeverityName[severity]);
     }
 
     /* pid */
-    size += snprintf(buf + size, len - size, " %5d", getpid());
+    size += snprintf(buf + size, len - size, " %d", getpid());
 
     /* filename:line [funcname] */
-    size += snprintf(buf + size, len - size, " %s:%5d [%s] ", file, line, func);
+    size += snprintf(buf + size, len - size, " %s:%d [%s] ", file, line, func);
     return size;
 }
 
-inline int Log_severity_valid(Severity s) { return s >= 0 && s < Smax; }
