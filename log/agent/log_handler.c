@@ -14,7 +14,6 @@ int fds[MODUSIZE] = {0};
 
 static log_err_t check_file(AsyncLog *this, int id);
 
-static int AsyncLog_filename(AsyncLog *this, int id, char buf[], int len);
 
 
 typedef log_err_t (*Handle)(AsyncLog *this, LogItem *log);
@@ -43,7 +42,7 @@ log_err_t AsyncLog_logger(AsyncLog *this, LogItem *log) {
     return handlers[log->type](this, log);
 }
 
-log_err_t handle_idle(AsyncLog *this, LogItem *log) { return 0; }
+log_err_t handle_idle(AsyncLog *this, LogItem *log) { return E_OK; }
 
 log_err_t handle_register(AsyncLog *this, LogItem *log) {
     if (log->len != sizeof(Item)) 
@@ -91,14 +90,12 @@ log_err_t check_file(AsyncLog *this, int id) {
             }
             return E_LOG_FILE_FULL;
         }
-        state->full = 0;
         return E_OK;
     }
 
     if (mc->fd) {
         close(mc->fd);
         mc->fd = -1;
-        state->full = 0;
     }
 
     mc->fd = open(filename, O_APPEND | O_CREAT | O_RDWR, 0666);
@@ -118,15 +115,3 @@ log_err_t check_file(AsyncLog *this, int id) {
     return E_OK;
 }
 
-/* 获取module当前对应的日志文件绝对路径名
- * 返回：名字长度 */
-int AsyncLog_filename(AsyncLog *this, int id, char buf[], int len) {
-    Item *item   = &this->module.item[id];
-    int size = 0;
-    size += snprintf(buf, len, LOG_PREFIX"%s/", item->path);
-    time_t now = time(0);
-    struct tm tm;
-    localtime_r(&now, &tm);
-    size += strftime(buf+size, len-size, "%F-%H.log", &tm);
-    return size;
-}

@@ -97,6 +97,8 @@ LogItem *AsyncLog_peekqueue(AsyncLog *this);
 /* 修改tail指针 */
 void AsyncLog_dequeue(AsyncLog *this);
 
+int AsyncLog_filename(AsyncLog *this, int id, char buf[], int len);
+
 static inline int AsyncLog_empty(AsyncLog *this) { return (this->header.head == this->header.tail) ? 1 : 0; }
 static inline int Module_id_valid(int id) { return id >= 0 && id < MODUSIZE; }
 static inline int Log_type_valid(int type) { return type >= 0 && type < LOGMAX; }

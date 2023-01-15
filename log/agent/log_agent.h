@@ -16,8 +16,12 @@
 
 extern log_err_t AsyncLog_logger(AsyncLog *this, LogItem *log);
 
+extern void AsyncLog_module_check(AsyncLog *this);
+
 /* 子进程消费共享内存循环队列中的日志记录 */
 extern void log_consumer();
+
+
 
 
 

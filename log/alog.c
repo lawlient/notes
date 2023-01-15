@@ -114,4 +114,16 @@ void AsyncLog_dequeue(AsyncLog *this) {
     }
 }
 
+/* 获取module当前对应的日志文件绝对路径名
+ * 返回：名字长度 */
+int AsyncLog_filename(AsyncLog *this, int id, char buf[], int len) {
+    Item *item   = &this->module.item[id];
+    int size = 0;
+    size += snprintf(buf, len, LOG_PREFIX"%s/", item->path);
+    time_t now = time(0);
+    struct tm tm;
+    localtime_r(&now, &tm);
+    size += strftime(buf+size, len-size, "%F-%H.log", &tm);
+    return size;
+}
 
