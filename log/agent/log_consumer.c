@@ -3,10 +3,7 @@
 
 
 
-void log_consumer() {
-    AsyncLog *alog = AsyncLog_new();
-    if (NULL == alog) return;
-
+void log_consumer(AsyncLog *alog) {
     do {
         LogItem *log = AsyncLog_peekqueue(alog);
         if (NULL == log /* empty */) {

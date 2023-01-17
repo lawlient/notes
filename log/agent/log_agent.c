@@ -1,5 +1,7 @@
 #include "log_agent.h"
 
+#include <console.h>
+
 #include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
@@ -11,7 +13,14 @@ static void try_lock_file();
 static void run_consumer();
 static void guard_consumer();
 
+static int show(int clientfd, int argc, char *argv[]);
 
+static AsyncLog *glog = NULL;
+
+static const Command cmds[] = {
+    {"show", show},
+    {0, 0},
+};
 
 int main(int argc, char *argv[]) {
     if (daemon(0, 0) < 0) {
@@ -59,7 +68,13 @@ void run_consumer() {
     if (cid < 0) {
 
     } else if (cid == 0) {
-        log_consumer();
+        glog = AsyncLog_new();
+        if (NULL == glog) exit(0);
+
+        Console console;
+        Console_init(&console, 7896, cmds);
+
+        log_consumer(glog);
         sleep(2);
         exit(0);
     } else {
@@ -93,3 +108,15 @@ void guard_consumer() {
     }
 }
 
+
+int show(int clientfd, int argc, char *argv[]) {
+    if (glog == NULL) {
+        dprintf(clientfd, "cannot access to shared memory\n");
+        return 0;
+    }
+
+    dprintf(clientfd, "head: %d\n", glog->header.head);
+    dprintf(clientfd, "tail: %d\n", glog->header.tail);
+    dprintf(clientfd, "length: %d\n", glog->header.len);
+    return 0;
+}

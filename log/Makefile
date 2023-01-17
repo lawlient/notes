@@ -6,7 +6,7 @@ TEST_SRC=$(wildcard ./client/*.c)
 all: log_agent test
 
 log_agent: $(AGENT_SRC) alog.c logging.c
-	gcc -g -Wall $(INC) $(AGENT_SRC) alog.c logging.c -o log_agent
+	gcc -g -Wall $(INC) $(AGENT_SRC) alog.c logging.c -o log_agent -lconsole -lpthread
 
 
 test: $(TEST_SRC) alog.c logging.c
