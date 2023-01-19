@@ -6,7 +6,7 @@
 #include <sys/socket.h>
 #include <sys/epoll.h>
 
-#define BUF_SIZE 100
+#define BUF_SIZE 4
 #define EPOLL_SIZE 50
 
 void error_handling(const char *m) {
@@ -54,6 +54,7 @@ int main(int argc, char *argv[]) {
       break;
     }
 
+    puts("wait again");
     for (int i = 0; i < event_cnt; i++) {
       if (ep_events[i].data.fd == server) {
         struct sockaddr_in cliAddr;
@@ -67,15 +68,15 @@ int main(int argc, char *argv[]) {
         epoll_ctl(epfd, EPOLL_CTL_ADD, client, &event);
         printf("connected client : %d\n", client);
       } else {
-        char buffer[BUF_SIZE];
-        int strLen = read(ep_events[i].data.fd, buffer, BUF_SIZE);
-        if (strLen == 0) {
-          epoll_ctl(epfd, EPOLL_CTL_DEL, ep_events[i].data.fd, NULL);
-          close(ep_events[i].data.fd);
-          printf("closed client: %d\n", ep_events[i].data.fd);
-        } else {
-          write(ep_events[i].data.fd, buffer, strLen);
-        }
+          char buffer[BUF_SIZE];
+          int strLen = read(ep_events[i].data.fd, buffer, BUF_SIZE);
+          if (strLen == 0) {     // close request
+            epoll_ctl(epfd, EPOLL_CTL_DEL, ep_events[i].data.fd, NULL);
+            close(ep_events[i].data.fd);
+            printf("closed client: %d\n", ep_events[i].data.fd);
+          } else {
+            write(ep_events[i].data.fd, buffer, strLen);
+          }
       }
     }
   }

@@ -42,7 +42,6 @@ int main(int argc, char *argv[]) {
 
 
 void try_lock_file(const char *lockfile) {
-    return;
     assert(lockfile);
     int fd = open(lockfile, O_WRONLY | O_CREAT, 0666);
     if (fd < 0) {
@@ -59,8 +58,12 @@ void try_lock_file(const char *lockfile) {
     lock.l_len = 0;
 
     if (fcntl(fd, F_SETLK, &lock) < 0) {
-        /* todo */
+        perror(strerror(errno));
+        exit(errno);
     }
+
+    dprintf(fd, "%d\n", getpid());
+    return;
 }
 
 void run_consumer() {

@@ -2,7 +2,9 @@
 #define CONSOLE_HEADER__
 
 
+#include <sys/epoll.h>
 
+#define MAXCONSOLE 10
 
 
 typedef int (*Handle)(int cfd, int argc, char *argv[]);
@@ -14,7 +16,8 @@ typedef struct Command_ {
 } Command;
 
 typedef struct Console_ {
-    int fd;
+    int epollfd;
+    struct epoll_event events[MAXCONSOLE];
     int port;
     const Command *cmds;
 } Console;
