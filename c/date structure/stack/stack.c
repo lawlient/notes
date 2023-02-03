@@ -1,55 +1,59 @@
 #include "stack.h"
-#include "malloc.h"
 
-#define OK 0
-#define ERROR 1
-
-#define INIT_SIZE (1 << 3)
+#include <stdlib.h>
 
 
-Status init_stack(Stack* s) {
-  s->base = (StackElem*)malloc(INIT_SIZE * sizeof(StackElem));
-  if (!s->base) return ERROR;
-  s->size = INIT_SIZE;
-  s->top  = s->base;
-  return OK;
+
+Stack *Stack_new(int elesize, int cap) {
+    int capacity = cap ? cap : 128;
+    Stack *s = malloc(sizeof(Stack) + capacity * elesize);
+    s->esize = elesize;
+    s->capacity = capacity;
+    s->top = s->base;
+
+    return s;
 }
 
-Status destroy_stack(Stack* s) {
-  if (!s) return OK;
-  free(s->base);
-  return OK;
+
+void Stack_delete(Stack *s) { free(s); }
+
+
+void *Stack_top(Stack *s) {
+    if (Stack_empty(s)) 
+        return NULL;
+
+    return s->top - s->esize;
 }
 
-Status top_stack(Stack* s, StackElem* e) {
-  if (empty_stack(s)) return ERROR;
-  *e = *(s->top - 1);
-  return OK;
+void *Stack_push(Stack *s) { return Stack_pushn(s, 1); }
+
+void *Stack_pushn(Stack *s, int n) {
+    while (Stack_size(s) + n > s->capacity) {
+        int newsize = sizeof(Stack) + 2 * s->capacity * s->esize;
+        s = realloc(s, newsize);
+        if (s == NULL) 
+            return NULL;
+        s->capacity *= 2;
+    }
+
+    void *next = s->top;
+    s->top += s->esize * n;
+    return next;
 }
 
-Status push_stack(Stack* s, StackElem e) {
-  if (size_stack(s) == s->size) {
-    StackSize new_size = s->size << 1;
-    s->base = (StackElem*)realloc(s->base, new_size * sizeof(StackElem));
-    if (!s->base) return ERROR;
-    s->top  = s->base + s->size;
-    s->size = new_size;
-    printf("realloc success new size:%u", new_size);
-  }
-  *s->top++ = e;
-  return OK;
+
+void *Stack_pop(Stack *s) {
+    if (Stack_empty(s)) 
+        return NULL;
+
+    s->top -= s->esize;
+    return s->top;
 }
 
-Status pop_stack(Stack* s) {
-  if (empty_stack(s)) return ERROR;
-  s->top--;
-  return OK;
-}
 
-bool empty_stack(Stack* s) {
-  return s->base == s->top;
-}
+inline int Stack_empty(Stack *s) { return s->top == s->base ? 1 : 0; }
 
-StackSize size_stack(Stack* s) {
-  return s->top - s->base;
-}
+inline int Stack_size(Stack *s) { return (s->top - s->base) / s->esize; }
+
+
+

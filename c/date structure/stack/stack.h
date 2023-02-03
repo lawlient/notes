@@ -4,31 +4,27 @@
 #include <stdint.h>
 
 
-enum StackElemType {
-  SE_UINT8_t  =  0x1,
-  SE_UINT16_t =  0x2,
-  SE_UINT32_t =  0x4,
-};
+ typedef struct Stack_ {
+     int esize;      // size of element 
+     int capacity;   // the element number current space can hold
+     char *top;
+     char base[];
+ } Stack; 
 
-// typedef void* StackElem;
-typedef uint32_t StackElem;
-typedef uint32_t StackSize;
 
-typedef struct Stack {
-  StackElem* top;
-  StackElem* base;
-  StackSize size;
-} Stack;
 
-typedef int Status;
+Stack *Stack_new(int elesize, int cap);
+void Stack_delete(Stack *s);
 
-Status init_stack(Stack* s);
-Status destroy_stack(Stack* s);
-Status top_stack(Stack* s, StackElem* e);
-Status push_stack(Stack* s, StackElem e);
-Status pop_stack(Stack* s);
-bool empty_stack(Stack* s);
-StackSize size_stack(Stack* s);
+void *Stack_top(Stack *s);
+void *Stack_push(Stack *s);
+void *Stack_pushn(Stack *s, int n);
+void *Stack_pop(Stack *s);
+int Stack_empty(Stack *s);
+int Stack_size(Stack *s);
+
+
+
 
 
 
