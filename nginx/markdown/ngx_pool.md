@@ -71,9 +71,22 @@ typedef struct ngx_pool_s {
 
 - `ngx_pool_cleanup_t *ngx_pool_cleanup_add(ngx_pool_t *p, size_t size)`
 
+    任意类型的资源池，用于组织所有结束时待释放的资源。
+    该函数用于添加一个资源节点，如打开的文件描述符。
+    实际为函数链表，待内存池释放时，统一进行资源回收处理。
+
 - `void ngx_pool_run_cleanup_file(ngx_pool_t *p, ngx_fd_t fd)`
+
+    从cleanup资源链中关闭指定fd的文件描述符，资源节点待内存池析构时统一回收。
 
 - `void ngx_pool_cleanup_file(void *data)`
 
+    释放ngx_pool_cleanup_file_t类型资源。
+    实际为关闭其中的fd。
+
 - `void ngx_pool_delete_file(void *data)`
+
+    同样释放ngx_pool_cleanup_file_t类型资源。
+    先删除name对应的文件。
+    再关闭fd对应的文件。
 
