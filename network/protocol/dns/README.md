@@ -54,16 +54,16 @@ DNS服务器：分布式存储系统，存储域名到ip地址的映射。
     </tr>
 </table>
 
-    |标志位  |  含义                                      |
-    |:-------|:-------------------------------------------|
-    | QR     | 0:request, 1:response                      |
-    | opcode | 0:标准查询；1：反向查询；2：服务器状态请求 |
-    | AA     | 授权回答（authoritative answer             |
-    | TC     | 可截断(truncated)                          |
-    | RD     | 期望递归(recursion desired)                | 
-    | RA     | 可用递归，表示服务器支持递归查询           |
-    | zero   | 必须 = 0                                   |
-    | rcode  | 错误码，0正常，3名字差错                   |
+|标志位  |  含义                                      |
+|:-------|:-------------------------------------------|
+| QR     | 0:request, 1:response                      |
+| opcode | 0:标准查询；1：反向查询；2：服务器状态请求 |
+| AA     | 授权回答（authoritative answer             |
+| TC     | 可截断(truncated)                          |
+| RD     | 期望递归(recursion desired)                | 
+| RA     | 可用递归，表示服务器支持递归查询           |
+| zero   | 必须 = 0                                   |
+| rcode  | 错误码，0正常，3名字差错                   |
 
 
 
