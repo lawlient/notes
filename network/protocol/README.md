@@ -9,6 +9,7 @@
 
 - [ARP](arp)
 - [RARP](rarp)
+- [DNS](dns)
 - [IP](ip)
 - [ICMP](icmp)
 - [TCP](tcp)
