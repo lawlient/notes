@@ -112,10 +112,10 @@ int read_event(int epfd, int c) {
 
     for (;;) {
         request->size = read(c, request->buf, BUFLEN);
-        if (size < 0 && errno == EAGAIN) {
+        if (request->size < 0 && errno == EAGAIN) {
             continue;
         }
-        if (size == 0) {
+        if (request->size == 0) {
             del_event(epfd, c);
             close(c);
             return 0;
@@ -124,10 +124,11 @@ int read_event(int epfd, int c) {
         if (fd == -1) {
             continue;
         }
-        write(fd, buf, size);
+        write(fd, request->buf, request->size);
         fsync(fd);
         close(fd);
     }
+    http_reqeust_destroy(request);
     return 0;
 }
 
