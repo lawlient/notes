@@ -1,0 +1,32 @@
+#ifndef SORT_HEADER__
+#define SORT_HEADER__
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <string.h>
+#include <assert.h>
+
+#define STDIN  0
+#define STDOUT 1
+
+
+
+typedef int (*sort_t)(int a[], int n);
+
+
+extern int quick_sort(int a[], int n);
+extern int insert_sort(int a[], int n);
+extern int merge_sort(int a[], int n);
+extern int heap_sort(int a[], int n);
+extern int select_sort(int a[], int n);
+extern int bubble_sort(int a[], int n);
+
+
+
+
+
+
+
+
+#endif
