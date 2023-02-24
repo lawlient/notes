@@ -6,10 +6,12 @@
 #include <unistd.h>
 #include <string.h>
 #include <assert.h>
+#include <limits.h>
 
 #define STDIN  0
 #define STDOUT 1
 
+#define SWAP(x, y) do { int z = (x); (x) = (y); (y) = z; } while(0);
 
 
 typedef int (*sort_t)(int a[], int n);
