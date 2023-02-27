@@ -23,7 +23,12 @@ sudo service ssh restart
 netsh interface portproxy set v4tov4 listenport=*yourport* listenaddress=0.0.0.0 connectport=*wsl port* connectaddress=*wsl ip*
 ```
 
-5. setting firewall in windows 
+5. show all port proxy config
+```
+netsh interface portproxy show all
+```
+
+6. setting firewall in windows 
 
 - windows安全中心-》防火墙和网络保护-》高级设置-》入站规则-》新建规则
 
