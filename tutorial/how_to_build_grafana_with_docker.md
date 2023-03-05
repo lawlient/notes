@@ -52,10 +52,24 @@
 
 ### 1. 安装mysql
 
-```docker pull mysql```拉去mysql镜像
+```docker pull mysql```拉取mysql镜像
 
-``` docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql```启动mysql容器
+```docker run -itd --name mysql -p 3306:3306 -e MYSQL_ROOT_PASSWORD=123456 mysql```启动mysql容器
 
+建表语句
+```
+create table `time_table` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `day` DATE,
+    `i` DOUBLE,
+    `s` DOUBLE,
+    `r` DOUBLE,
+    `b` DOUBLE,
+    `t` DOUBLE,
+    `update_time` DATETIME,
+    primary key(`id`)
+)ENGINE=InnoDB DEFAULT charset=utf8;
+```
 
 
 ### 2. grafana安装
