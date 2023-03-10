@@ -66,7 +66,22 @@ create table `time_table` (
     `r` DOUBLE,
     `b` DOUBLE,
     `t` DOUBLE,
-    `update_time` DATETIME,
+    `ctime` DATETIME,
+    `mtime` DATETIME,
+    primary key(`id`)
+)ENGINE=InnoDB DEFAULT charset=utf8;
+```
+
+```
+create table `financial` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `timestamp` DATETIME,
+    `account` VARCHAR(30),
+    `amount` DOUBLE,
+    `type` TINYINT,
+    `comments` VARCHAR(120),
+    `ctime` DATETIME,
+    `mtime` DATETIME,
     primary key(`id`)
 )ENGINE=InnoDB DEFAULT charset=utf8;
 ```
