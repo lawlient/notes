@@ -11,7 +11,7 @@
 
 
 
-#define LOCKFILE "/data/services/log_agent/lock.pid"
+#define LOCKFILE "/var/run/asynclog.pid"
 
 
 extern log_err_t AsyncLog_logger(AsyncLog *this, LogItem *log);
