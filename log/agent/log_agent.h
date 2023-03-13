@@ -2,8 +2,8 @@
 #define ASYNCLOG_AGENT_HEADER__
 
 
-#include "alog.h"
-#include "logging.h"
+#include "asynclog.h"
+#include "async_logger.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>

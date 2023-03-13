@@ -29,10 +29,12 @@ static const Command cmds[] = {
 #endif
 
 int main(int argc, char *argv[]) {
+#ifdef DAEMON
     if (daemon(0, 0) < 0) {
         perror("daemonize failure");
         exit(errno);
     }
+#endif
 
     try_lock_file(LOCKFILE);
 

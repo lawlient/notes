@@ -1,7 +1,8 @@
 #ifndef ASYNCLOG_HEADER__
 #define ASYNCLOG_HEADER__
 
-#include "error.h"
+
+#include <errno.h>
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -33,6 +34,28 @@
 #define sbarrier() __asm__ __volatile__("sfence" :: : "memory")
 #define lbarrier() __asm__ __volatile__("lfence" :: : "memory")
 #define CAS(m, o, n) __sync_bool_compare_and_swap(&(m), (o), (n))
+
+
+
+typedef int log_err_t;
+#define E_OK                          0     /* everything's fine */
+#define E_INVALID_LEVEL               1
+#define E_NOT_ATTACH                  2
+#define E_SHMM_RESETING               3
+#define E_MODULE_NOT_REG              4
+#define E_MODULE_FULL                 5
+#define E_CAS_FAIL                    6
+#define E_QUEUE_FULL                  7
+#define E_LOG_MAGIC_ERR               8
+#define E_LOG_WRITING                 9
+#define E_QUEUE_BROKEN               10
+#define E_MODULE_ID_ERR              11
+#define E_LOG_FILE_FULL              12
+#define E_CREAT_LOGDIR_FAIL          13
+#define E_OPEN_LOG_FILE_FAIL         14
+#define E_INVALID_LOGTYPE            15
+
+
 
 typedef struct Header_ {
     int magic;      /* 用于生产者attach时简单校验 */
@@ -91,15 +114,15 @@ int AsyncLog_delete();
 
 
 /* 修改head指针，获取指定长度的队列空间 */
-log_err_t AsyncLog_enqueue(AsyncLog *this, int len, LogItem **log);
+log_err_t AsyncLog_enqueue(AsyncLog *, int len, LogItem **log);
 /* 获取一条log， 不修改tail指针 */
-LogItem *AsyncLog_peekqueue(AsyncLog *this);
+LogItem *AsyncLog_peekqueue(AsyncLog *);
 /* 修改tail指针 */
-void AsyncLog_dequeue(AsyncLog *this);
+void AsyncLog_dequeue(AsyncLog *);
 
-int AsyncLog_filename(AsyncLog *this, int id, char buf[], int len);
+int AsyncLog_filename(AsyncLog *, int id, char buf[], int len);
 
-static inline int AsyncLog_empty(AsyncLog *this) { return (this->header.head == this->header.tail) ? 1 : 0; }
+static inline int AsyncLog_empty(AsyncLog *ins) { return (ins->header.head == ins->header.tail) ? 1 : 0; }
 static inline int Module_id_valid(int id) { return id >= 0 && id < MODUSIZE; }
 static inline int Log_type_valid(int type) { return type >= 0 && type < LOGMAX; }
 static inline int Log_magic_valid(LogItem* log) { return log->magic == LOG_MAGIC; }

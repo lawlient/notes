@@ -1,6 +1,6 @@
-#include "alog.h"
+#include "asynclog.h"
 
-#include "logging.h"
+#include "async_logger.h"
 
 #include <pthread.h>
 

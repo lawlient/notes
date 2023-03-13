@@ -1,9 +1,7 @@
 #ifndef LOGGING_HEADER__
 #define LOGGING_HEADER__
 
-#include "alog.h"
-
-
+#include "asynclog.h"
 
 
 #define LOG(log, s, fmt, ...)  Log_log((log), (s), __FILE__, __LINE__, __func__, (fmt), __VA_ARGS__)
@@ -31,10 +29,10 @@ typedef struct Log_ {
 Log *Log_new(Severity severity, int id, int max, const char* path);
 
 /* send register log to queue */
-log_err_t Log_register(Log *this);
+log_err_t Log_register(Log *);
 
 /* send normal log to queue */
-log_err_t Log_log(Log *this, Severity severity, const char* file, int line, const char* func, const char *fmt, ...);
+log_err_t Log_log(Log *, Severity severity, const char* file, int line, const char* func, const char *fmt, ...);
 
 
 static inline int Log_severity_valid(Severity s) { return s >= 0 && s < Smax; }
