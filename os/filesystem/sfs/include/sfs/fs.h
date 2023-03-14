@@ -49,6 +49,11 @@ private:
     std::vector<InodeBitMap> free_inode;
 
 
+private:
+    Inode read_inode(size_t inumber) const;
+    uint32_t data_block_index(const Inode& ino, size_t offset) const;
+    uint32_t data_block_next_index() const;
+
 public:
     FileSystem() = default;
 

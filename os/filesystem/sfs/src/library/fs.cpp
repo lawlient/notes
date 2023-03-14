@@ -77,9 +77,9 @@ bool FileSystem::format(Disk *disk) {
     }
     Block block;
     block.Super.MagicNumber = MAGIC_NUMBER;
-    block.Super.Blocks = disk->size();
+    block.Super.Blocks      = disk->size();
     block.Super.InodeBlocks = ceil(0.1 * disk->size());
-    block.Super.Inodes = block.Super.InodeBlocks * INODES_PER_BLOCK;
+    block.Super.Inodes      = block.Super.InodeBlocks * INODES_PER_BLOCK;
     disk->write(0, (char *)&block);
 
     // Clear all other blocks
@@ -219,28 +219,12 @@ ssize_t FileSystem::stat(size_t inumber) {
 
 ssize_t FileSystem::read(size_t inumber, char *data, size_t length, size_t offset) {
     // Load inode information
-    uint32_t i, j;
-    i = inumber / INODES_PER_BLOCK;
-    j = inumber % INODES_PER_BLOCK;
-    Block b;
-    disk->read(1+i, b.Data);
-    auto& ino = b.Inodes[j];
-    if (!ino.Valid) {
-        return -1;
-    }
-    if (offset >= ino.Size) {
-        return -1;
-    } 
+    auto ino = read_inode(inumber);
+    if (!ino.Valid) return -1;
+    if (offset >= ino.Size) return -1;
 
     // Adjust length
-    uint32_t db_idx = 0;
-    if (offset < Disk::BLOCK_SIZE * 5) {
-        db_idx = ino.Direct[offset / Disk::BLOCK_SIZE];
-    } else {
-        Block ind;
-        disk->read(ino.Indirect, ind.Data);
-        db_idx = ind.Pointers[(offset - Disk::BLOCK_SIZE * 5) / Disk::BLOCK_SIZE];
-    }
+    uint32_t db_idx = data_block_index(ino, offset);
 
     // Read block and copy to data
     ssize_t size = 0;
@@ -253,9 +237,88 @@ ssize_t FileSystem::read(size_t inumber, char *data, size_t length, size_t offse
 
 // Write to inode --------------------------------------------------------------
 
+// simple write， it is just for appending
 ssize_t FileSystem::write(size_t inumber, char *data, size_t length, size_t offset) {
     // Load inode
+    uint32_t i, j;
+    i = inumber / INODES_PER_BLOCK;
+    j = inumber % INODES_PER_BLOCK;
+    Block inoblock;
+    disk->read(1+i, inoblock.Data);
+    auto& ino = inoblock.Inodes[j];
+    if (!ino.Valid) return -1;
     
     // Write block and copy to data
+    ssize_t size = 0;
+    Block b;
+    uint32_t idx;
+
+    // there are bugs
+    // the reality is more complex，we need handle indirect pointer 
+    // but for now, we can underestand the principle of filesystem
+    while ((size_t)size < length) {
+        idx = data_block_index(ino, offset+size);
+        if (0 == idx) {
+            idx = data_block_next_index();
+            for (uint32_t i = 0; i < POINTERS_PER_INODE; i++) {
+                if (ino.Direct[i] == 0) {
+                    ino.Direct[i] = idx;
+                    break;
+                }
+                //todo indirect
+            }
+        }
+        if (0 == idx) break;
+        disk->read(idx, b.Data);
+        ssize_t used  = strlen(b.Data); // 当前块使用大小
+        ssize_t space = Disk::BLOCK_SIZE - used; // 当前块剩余大小
+        ssize_t tow = std::min(space, (ssize_t)length-size);
+        memcpy(b.Data+used, data+size, tow);
+        size += tow;
+        disk->write(idx, b.Data);
+    }
+    ino.Size += size;
+    disk->write(1+i, inoblock.Data);
+    return size;
+}
+
+
+
+// private ------------------------
+
+FileSystem::Inode FileSystem::read_inode(size_t inumber) const {
+    uint32_t i, j;
+    i = inumber / INODES_PER_BLOCK;
+    j = inumber % INODES_PER_BLOCK;
+    Block b;
+    disk->read(1+i, b.Data);
+    return b.Inodes[j];
+}
+
+uint32_t FileSystem::data_block_index(const FileSystem::Inode& ino, size_t offset) const {
+    if (offset < Disk::BLOCK_SIZE * POINTERS_PER_INODE) {
+       return ino.Direct[offset / Disk::BLOCK_SIZE];
+    }
+
+    Block ind;
+    disk->read(ino.Indirect, ind.Data);
+    return ind.Pointers[(offset - Disk::BLOCK_SIZE * POINTERS_PER_INODE) / Disk::BLOCK_SIZE];
+}
+
+/* find next free data block 
+    should use block bitmap to manager 
+    for now, we just read data block one by one to check whether it's used or not
+*/
+uint32_t FileSystem::data_block_next_index() const {
+    Block b;
+    uint32_t i = 1+super.InodeBlocks;
+    while (i < super.Blocks) {
+        disk->read(i, b.Data);
+        if (b.Data[0] != 0) {
+            i++;
+            continue;
+        }
+        return i;
+    }
     return 0;
 }
